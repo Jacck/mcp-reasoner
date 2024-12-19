@@ -2,6 +2,8 @@
 
 A systematic reasoning MCP server implementation for Claude Desktop with beam search and thought evaluation capabilities.
 
+<a href="https://glama.ai/mcp/servers/g71nwrrr8e"><img width="380" height="200" src="https://glama.ai/mcp/servers/g71nwrrr8e/badge" alt="mcp-reasoner MCP server" /></a>
+
 ## Features
 
 - Beam search with configurable width
