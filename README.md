@@ -16,7 +16,8 @@ A reasoning implementation for Claude Desktop that lets you use both Beam Search
 >
 >         - Simplified API for direct model access
 >
->     *NOTE* Requires OpenRouter API key for accessing the R1 model
+>     *NOTE* Requires OpenRouter API key for accessing the R1 model.
+>     *NOTE* While OpenRouter selects deepseek/deepseek-r1 as the default model to lower costs, often Fireworks/TogetherAI is selected as the provider as fallback.
 
 #### Previous Version:
 **v2.0.0**
@@ -42,21 +43,6 @@ A reasoning implementation for Claude Desktop that lets you use both Beam Search
 >     *NOTE* the implementation of these alpha simulators is not complete and is subject to change
 
 
-What happened to `mcts-001-alpha` and `mcts-001alt-alpha`?
-> Quite simply: It was useless and near similar to the base `mcts` method. After initial testing the results yielded in basic thought processes was near similar showing that simply adding policy simulation may not have an effect.
-
-So why add Polciy Simulation Layer now?
-> Well i think its important to incorporate Policy AND Search in tandem as that is how most of the algorithms implement them.
-
-#### Previous Versions:
-**v1.1.0**
-
-> Added model control over search parameters:
->
-> beamWidth - lets Claude adjust how many paths to track (1-10)
->
-> numSimulations - fine-tune MCTS simulation count (1-150)
-
 ## Features
 - Two search strategies that you can switch between:
    - Beam search (good for straightforward stuff)
@@ -68,7 +54,7 @@ So why add Polciy Simulation Layer now?
 
 ## Installation
 ```
-git clone https://github.com/frgmt0/mcp-reasoner.git 
+git clone https://github.com/frgmt0/mcp-reasoner.git
 
 OR clone the original:
 
@@ -87,6 +73,11 @@ Add to Claude Desktop config:
     "mcp-reasoner": {
       "command": "node",
       "args": ["path/to/mcp-reasoner/dist/index.js"],
+      "env": {
+        "OPENROUTER_API_KEY": "your-openrouter-api-key"
+        "SITE_URL": "https://github.com/Jacck/mcp-reasoner.git", // you dont have to change this
+        "SITE_NAME": "mcp-reasoner" // you dont have to change this
+      }
     }
   }
 }

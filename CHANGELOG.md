@@ -7,6 +7,13 @@ Note: Changelog is not complete and may be updated at any time for any reason. R
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2025-01-27
+
+### Added
+- r1-sonnet hybrid reasoning strategy
+  - r1-sonnet passes in your prompt to deepseek/deepseek-r1 and returns the response for Claude to use
+- new tool schema specifically for r1-sonnet
+
 ## [2.0.0] - 2025-01-06
 
 ### Added
