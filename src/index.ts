@@ -9,7 +9,7 @@ import { ReasoningStrategy } from './strategies/factory.js';
 const server = new Server(
   {
     name: "mcp-reasoner",
-    version: "1.0.0",
+    version: "2.1.0",
   },
   {
     capabilities: {
@@ -167,7 +167,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     try {
       const r1Strategy = new R1SonnetStrategy(null); // stateManager not needed for direct calls
       const response = await r1Strategy.getR1Response(request.params.arguments.prompt);
-      
+
       return {
         content: [{
           type: "text",
