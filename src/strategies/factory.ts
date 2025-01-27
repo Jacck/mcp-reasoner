@@ -19,7 +19,8 @@ export class StrategyFactory {
     type: ReasoningStrategy,
     stateManager: StateManager,
     beamWidth?: number,
-    numSimulations?: number
+    numSimulations?: number,
+    config?: Partial<Config>
   ): BaseStrategy {
     switch (type) {
       case ReasoningStrategy.BEAM_SEARCH:

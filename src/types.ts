@@ -39,12 +39,22 @@ export interface ReasoningStats {
   strategyMetrics?: Record<string, any>;
 }
 
-export const CONFIG = {
-  beamWidth: 3,     // Keep top 3 paths
-  maxDepth: 5,      // Reasonable depth limit
-  minScore: 0.5,    // Threshold for path viability
-  temperature: 0.7, // For thought diversity
-  cacheSize: 1000,  // LRU cache size
-  defaultStrategy: 'beam_search', // Default reasoning strategy
-  numSimulations: 50 // Default number of MCTS simulations
-} as const;
+export interface Config {
+  beamWidth: number;     // Keep top N paths
+  maxDepth: number;      // Reasonable depth limit
+  minScore: number;    // Threshold for path viability
+  temperature: number; // For thought diversity
+  cacheSize: number;  // LRU cache size
+  defaultStrategy: string; // Default reasoning strategy
+  numSimulations: number; // Default number of MCTS simulations
+}
+
+export const CONFIG: Config = {
+  beamWidth: 3,
+  maxDepth: 5,
+  minScore: 0.5,
+  temperature: 0.7,
+  cacheSize: 1000,
+  defaultStrategy: 'beam_search',
+  numSimulations: 50
+};
