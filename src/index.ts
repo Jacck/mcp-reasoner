@@ -164,15 +164,39 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       };
     }
     else if (request.params.name === "mcp-reasoner-r1") {
-      const r1Strategy = new R1SonnetStrategy(null); // stateManager not needed for direct calls
-      const response = await r1Strategy.getR1Response(request.params.arguments.prompt);
+      try {
+        const r1Strategy = new R1SonnetStrategy(null); // stateManager not needed for direct calls
+        const response = await r1Strategy.getR1Response(request.params.arguments.prompt);
 
-      return {
-        content: [{
-          type: "text",
-          text: JSON.stringify({ response })
-        }]
-      };
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify({ 
+              success: true,
+              response,
+              metadata: {
+                model: "deepseek/deepseek-r1",
+                timestamp: new Date().toISOString()
+              }
+            })
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify({
+              success: false,
+              error: error instanceof Error ? error.message : String(error),
+              metadata: {
+                model: "deepseek/deepseek-r1",
+                timestamp: new Date().toISOString()
+              }
+            })
+          }],
+          isError: true
+        };
+      }
     }
     else {
       return {

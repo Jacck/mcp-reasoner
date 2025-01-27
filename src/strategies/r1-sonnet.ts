@@ -25,8 +25,31 @@ export class R1SonnetStrategy extends BaseStrategy {
     this.siteName = config?.siteName || process.env.SITE_NAME || '';
   }
 
+  private formatErrorMessage(error: any): string {
+    if (error.name === 'AbortError') {
+      return 'The request timed out. The model is taking too long to respond.';
+    }
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      return 'Network error. Please check your internet connection.';
+    }
+    if (error instanceof Error) {
+      if (error.message.includes('API key')) {
+        return 'Invalid or missing API key. Please check your OPENROUTER_API_KEY environment variable.';
+      }
+      return error.message;
+    }
+    return 'An unexpected error occurred while calling the R1 API.';
+  }
+
   public async getR1Response(prompt: string): Promise<string> {
+    if (!this.apiKey) {
+      throw new Error('OPENROUTER_API_KEY environment variable is not set');
+    }
+
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 minute timeout
+
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -43,14 +66,28 @@ export class R1SonnetStrategy extends BaseStrategy {
               "content": prompt
             }
           ]
-        })
+        }),
+        signal: controller.signal
       });
 
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `API returned status ${response.status}`);
+      }
+
       const data = await response.json() as R1Response;
+      
+      if (!data.choices?.[0]?.message?.content) {
+        throw new Error('Received invalid response format from API');
+      }
+
       return data.choices[0].message.content;
     } catch (error) {
+      const friendlyMessage = this.formatErrorMessage(error);
       console.error('Error calling R1 API:', error);
-      throw new Error('Failed to get response from R1 API');
+      throw new Error(friendlyMessage);
     }
   }
 
