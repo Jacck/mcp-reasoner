@@ -2,6 +2,23 @@
 A reasoning implementation for Claude Desktop that lets you use both Beam Search and Monte Carlo Tree Search (MCTS). tbh this started as a way to see if we could make Claude even better at complex problem-solving... turns out we definitely can.
 
 ### Current Version:
+**v2.1.0**
+
+#### What's New:
+
+> Added R1-Sonnet Integration:
+>
+>     - New tool schema `mcp-reasoner-r1`:
+>
+>         - Direct integration with deepseek/deepseek-r1 model
+>
+>         - Allows Claude to leverage R1's reasoning capabilities
+>
+>         - Simplified API for direct model access
+>
+>     *NOTE* Requires OpenRouter API key for accessing the R1 model
+
+#### Previous Version:
 **v2.0.0**
 
 #### What's New:
