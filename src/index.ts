@@ -4,6 +4,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { Reasoner } from './reasoner.js';
 import { ReasoningStrategy } from './strategies/factory.js';
+import { R1SonnetStrategy } from './strategies/r1-sonnet.js';
 
 // Initialize server
 const server = new Server(
