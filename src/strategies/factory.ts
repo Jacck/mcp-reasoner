@@ -1,4 +1,5 @@
 import { StateManager } from '../state.js';
+import { Config } from '../types.js';
 import { BaseStrategy } from './base.js';
 import { BeamSearchStrategy } from './beam-search.js';
 import { MonteCarloTreeSearchStrategy } from './mcts.js';

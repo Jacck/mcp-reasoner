@@ -114,7 +114,7 @@ Keep each section concise but thorough. Focus on deep analytical thinking.`;
 
     return {
       nodeId,
-      thought: r1Thinking,
+      thought: r1Response,
       score,
       depth: request.thoughtNumber,
       isComplete: !request.nextThoughtNeeded,
