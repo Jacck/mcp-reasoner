@@ -4,12 +4,13 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { Reasoner } from './reasoner.js';
 import { ReasoningStrategy } from './strategies/factory.js';
+import { R1SonnetStrategy } from './strategies/r1-sonnet.js';
 
 // Initialize server
 const server = new Server(
   {
     name: "mcp-reasoner",
-    version: "1.0.0",
+    version: "2.1.0",
   },
   {
     capabilities: {
@@ -99,63 +100,118 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       },
       required: ["thought", "thoughtNumber", "totalThoughts", "nextThoughtNeeded"]
     }
+  },
+  {
+    name: "mcp-reasoner-r1",
+    description: "Use deepseek/deepseek-r1 to think about the given topic.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        prompt: {
+          type: "string",
+          description: "what the user's prompt was/is"
+        }
+      },
+      required: ["prompt"]
+    }
   }]
 }));
 
 // Handle requests
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name !== "mcp-reasoner") {
-    return {
-      content: [{
-        type: "text",
-        text: JSON.stringify({ error: "Unknown tool", success: false })
-      }],
-      isError: true
-    };
-  }
-
   try {
-    // Process and validate input
-    const step = processInput(request.params.arguments);
+    if (request.params.name === "mcp-reasoner") {
+      // Process and validate input
+      const step = processInput(request.params.arguments);
 
-    // Process thought with selected strategy
-    const response = await reasoner.processThought({
-      thought: step.thought,
-      thoughtNumber: step.thoughtNumber,
-      totalThoughts: step.totalThoughts,
-      nextThoughtNeeded: step.nextThoughtNeeded,
-      strategyType: step.strategyType,
-      beamWidth: step.beamWidth,
-      numSimulations: step.numSimulations
-    });
+      // Process thought with selected strategy
+      const response = await reasoner.processThought({
+        thought: step.thought,
+        thoughtNumber: step.thoughtNumber,
+        totalThoughts: step.totalThoughts,
+        nextThoughtNeeded: step.nextThoughtNeeded,
+        strategyType: step.strategyType,
+        beamWidth: step.beamWidth,
+        numSimulations: step.numSimulations
+      });
 
-    // Get reasoning stats
-    const stats = await reasoner.getStats();
+      // Get reasoning stats
+      const stats = await reasoner.getStats();
 
-    // Return enhanced response
-    const result = {
-      thoughtNumber: step.thoughtNumber,
-      totalThoughts: step.totalThoughts,
-      nextThoughtNeeded: step.nextThoughtNeeded,
-      thought: step.thought,
-      nodeId: response.nodeId,
-      score: response.score,
-      strategyUsed: response.strategyUsed,
-      stats: {
-        totalNodes: stats.totalNodes,
-        averageScore: stats.averageScore,
-        maxDepth: stats.maxDepth,
-        branchingFactor: stats.branchingFactor,
-        strategyMetrics: stats.strategyMetrics
+      // Return enhanced response
+      const result = {
+        thoughtNumber: step.thoughtNumber,
+        totalThoughts: step.totalThoughts,
+        nextThoughtNeeded: step.nextThoughtNeeded,
+        thought: step.thought,
+        nodeId: response.nodeId,
+        score: response.score,
+        strategyUsed: response.strategyUsed,
+        stats: {
+          totalNodes: stats.totalNodes,
+          averageScore: stats.averageScore,
+          maxDepth: stats.maxDepth,
+          branchingFactor: stats.branchingFactor,
+          strategyMetrics: stats.strategyMetrics
+        }
+      };
+
+      return {
+        content: [{
+          type: "text",
+          text: JSON.stringify(result)
+        }]
+      };
+    }
+    else if (request.params.name === "mcp-reasoner-r1") {
+      try {
+        console.log('R1 request received:', request.params.arguments);
+        const r1Strategy = new R1SonnetStrategy(null);
+        const response = await r1Strategy.getR1Response(request.params.arguments.prompt);
+        console.log('R1 response received:', response);
+
+        const result = {
+          success: true,
+          response,
+          metadata: {
+            model: "deepseek/deepseek-r1",
+            timestamp: new Date().toISOString()
+          }
+        };
+        console.log('Sending result:', result);
+
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify(result)
+          }]
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify({
+              success: false,
+              error: error instanceof Error ? error.message : String(error),
+              metadata: {
+                model: "deepseek/deepseek-r1",
+                timestamp: new Date().toISOString()
+              }
+            })
+          }],
+          isError: true
+        };
       }
-    };
-
-    return {
-      content: [{
-        type: "text",
-        text: JSON.stringify(result)
-      }]
-    };
+    }
+    else {
+      return {
+        content: [{
+          type: "text",
+          text: JSON.stringify({ error: "Unknown tool", success: false })
+        }],
+        isError: true
+      };
+    }
   } catch (error) {
     return {
       content: [{
