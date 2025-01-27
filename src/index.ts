@@ -99,20 +99,26 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       },
       required: ["thought", "thoughtNumber", "totalThoughts", "nextThoughtNeeded"]
     }
+  },
+  {
+    name: "mcp-reasoner-r1",
+    description: "Use deepseek/deepseek-r1 to think about the given topic.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        prompt: {
+          type: "string",
+          description: "what the user's prompt was/is"
+        }
+      },
+      required: ["prompt"]
+    }
   }]
 }));
 
 // Handle requests
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name !== "mcp-reasoner") {
-    return {
-      content: [{
-        type: "text",
-        text: JSON.stringify({ error: "Unknown tool", success: false })
-      }],
-      isError: true
-    };
-  }
+  if (request.params.name === "mcp-reasoner") {
 
   try {
     // Process and validate input
@@ -156,6 +162,40 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         text: JSON.stringify(result)
       }]
     };
+  }
+  else if (request.params.name === "mcp-reasoner-r1") {
+    try {
+      const r1Strategy = new R1SonnetStrategy(null); // stateManager not needed for direct calls
+      const response = await r1Strategy.getR1Response(request.params.arguments.prompt);
+      
+      return {
+        content: [{
+          type: "text",
+          text: JSON.stringify({ response })
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: JSON.stringify({
+            error: error instanceof Error ? error.message : String(error),
+            success: false
+          })
+        }],
+        isError: true
+      };
+    }
+  }
+  else {
+    return {
+      content: [{
+        type: "text",
+        text: JSON.stringify({ error: "Unknown tool", success: false })
+      }],
+      isError: true
+    };
+  }
   } catch (error) {
     return {
       content: [{
