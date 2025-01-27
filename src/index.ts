@@ -165,20 +165,25 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
     else if (request.params.name === "mcp-reasoner-r1") {
       try {
-        const r1Strategy = new R1SonnetStrategy(null); // stateManager not needed for direct calls
+        console.log('R1 request received:', request.params.arguments);
+        const r1Strategy = new R1SonnetStrategy(null);
         const response = await r1Strategy.getR1Response(request.params.arguments.prompt);
+        console.log('R1 response received:', response);
+
+        const result = {
+          success: true,
+          response,
+          metadata: {
+            model: "deepseek/deepseek-r1",
+            timestamp: new Date().toISOString()
+          }
+        };
+        console.log('Sending result:', result);
 
         return {
           content: [{
             type: "text",
-            text: JSON.stringify({ 
-              success: true,
-              response,
-              metadata: {
-                model: "deepseek/deepseek-r1",
-                timestamp: new Date().toISOString()
-              }
-            })
+            text: JSON.stringify(result)
           }]
         };
       } catch (error) {
