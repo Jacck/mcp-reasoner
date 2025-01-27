@@ -118,53 +118,51 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 
 // Handle requests
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name === "mcp-reasoner") {
-
   try {
-    // Process and validate input
-    const step = processInput(request.params.arguments);
+    if (request.params.name === "mcp-reasoner") {
+      // Process and validate input
+      const step = processInput(request.params.arguments);
 
-    // Process thought with selected strategy
-    const response = await reasoner.processThought({
-      thought: step.thought,
-      thoughtNumber: step.thoughtNumber,
-      totalThoughts: step.totalThoughts,
-      nextThoughtNeeded: step.nextThoughtNeeded,
-      strategyType: step.strategyType,
-      beamWidth: step.beamWidth,
-      numSimulations: step.numSimulations
-    });
+      // Process thought with selected strategy
+      const response = await reasoner.processThought({
+        thought: step.thought,
+        thoughtNumber: step.thoughtNumber,
+        totalThoughts: step.totalThoughts,
+        nextThoughtNeeded: step.nextThoughtNeeded,
+        strategyType: step.strategyType,
+        beamWidth: step.beamWidth,
+        numSimulations: step.numSimulations
+      });
 
-    // Get reasoning stats
-    const stats = await reasoner.getStats();
+      // Get reasoning stats
+      const stats = await reasoner.getStats();
 
-    // Return enhanced response
-    const result = {
-      thoughtNumber: step.thoughtNumber,
-      totalThoughts: step.totalThoughts,
-      nextThoughtNeeded: step.nextThoughtNeeded,
-      thought: step.thought,
-      nodeId: response.nodeId,
-      score: response.score,
-      strategyUsed: response.strategyUsed,
-      stats: {
-        totalNodes: stats.totalNodes,
-        averageScore: stats.averageScore,
-        maxDepth: stats.maxDepth,
-        branchingFactor: stats.branchingFactor,
-        strategyMetrics: stats.strategyMetrics
-      }
-    };
+      // Return enhanced response
+      const result = {
+        thoughtNumber: step.thoughtNumber,
+        totalThoughts: step.totalThoughts,
+        nextThoughtNeeded: step.nextThoughtNeeded,
+        thought: step.thought,
+        nodeId: response.nodeId,
+        score: response.score,
+        strategyUsed: response.strategyUsed,
+        stats: {
+          totalNodes: stats.totalNodes,
+          averageScore: stats.averageScore,
+          maxDepth: stats.maxDepth,
+          branchingFactor: stats.branchingFactor,
+          strategyMetrics: stats.strategyMetrics
+        }
+      };
 
-    return {
-      content: [{
-        type: "text",
-        text: JSON.stringify(result)
-      }]
-    };
-  }
-  else if (request.params.name === "mcp-reasoner-r1") {
-    try {
+      return {
+        content: [{
+          type: "text",
+          text: JSON.stringify(result)
+        }]
+      };
+    }
+    else if (request.params.name === "mcp-reasoner-r1") {
       const r1Strategy = new R1SonnetStrategy(null); // stateManager not needed for direct calls
       const response = await r1Strategy.getR1Response(request.params.arguments.prompt);
 
@@ -174,28 +172,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           text: JSON.stringify({ response })
         }]
       };
-    } catch (error) {
+    }
+    else {
       return {
         content: [{
           type: "text",
-          text: JSON.stringify({
-            error: error instanceof Error ? error.message : String(error),
-            success: false
-          })
+          text: JSON.stringify({ error: "Unknown tool", success: false })
         }],
         isError: true
       };
     }
-  }
-  else {
-    return {
-      content: [{
-        type: "text",
-        text: JSON.stringify({ error: "Unknown tool", success: false })
-      }],
-      isError: true
-    };
-  }
   } catch (error) {
     return {
       content: [{
