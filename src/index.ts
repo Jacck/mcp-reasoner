@@ -216,30 +216,41 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
     } else if (request.params.name === "mcp-reasoner-r1") {
       try {
-        console.log("R1 request received:", request.params.arguments);
         const r1Strategy = new R1SonnetStrategy(null);
-        const response = await r1Strategy.getR1Response(
-          request.params.arguments.prompt,
+        const cycles = await r1Strategy.executeReasoningCycle(
+          request.params.arguments.prompt
         );
-        console.log("R1 response received:", response);
+
+        // Format the response with clear sections
+        const formattedResponse = cycles.map((cycle, index) => 
+          `**REASONING CYCLE ${index + 1}**\n\n` +
+          `Initial Thought:\n${cycle.thought}\n\n` +
+          `Critique:\n${cycle.critique}\n\n` +
+          `Refined Reasoning:\n${cycle.refinement}\n\n` +
+          `Confidence: ${(cycle.confidence * 100).toFixed(1)}%\n`
+        ).join('\n---\n\n');
 
         const result = {
           success: true,
-          response,
+          response: formattedResponse,
           metadata: {
-            model: "deepseek-r1-distill-llama-70b",
-            timestamp: new Date().toISOString(),
-          },
+            model: {
+              reasoning: "deepseek-r1-distill-llama-70b",
+              critique: "llama-3.3-70b-versatile"
+            },
+            cycles: cycles.length,
+            finalConfidence: cycles[cycles.length - 1].confidence,
+            timestamp: new Date().toISOString()
+          }
         };
-        console.log("Sending result:", result);
 
         return {
           content: [
             {
               type: "text",
-              text: JSON.stringify(result),
-            },
-          ],
+              text: JSON.stringify(result)
+            }
+          ]
         };
       } catch (error) {
         return {
