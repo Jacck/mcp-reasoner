@@ -1,28 +1,110 @@
 import { BaseStrategy } from './base.js';
 import { ReasoningRequest, ReasoningResponse } from '../types.js';
-
-interface R1Response {
-  choices: [{
-    message: {
-      content: string;
-    }
-  }];
-}
+import Groq from 'groq-sdk';
 
 export class R1SonnetStrategy extends BaseStrategy {
-  private apiKey: string;
-  private siteUrl: string;
-  private siteName: string;
+  private client: Groq;
+  private maxCycles: number;
+  private reasoningModel: string;
+  private critiqueModel: string;
 
   constructor(stateManager: any, config?: { 
     apiKey?: string;
-    siteUrl?: string;
-    siteName?: string;
+    maxCycles?: number;
   }) {
     super(stateManager);
-    this.apiKey = config?.apiKey || process.env.OPENROUTER_API_KEY || '';
-    this.siteUrl = config?.siteUrl || process.env.SITE_URL || '';
-    this.siteName = config?.siteName || process.env.SITE_NAME || '';
+    this.client = new Groq({
+      apiKey: config?.apiKey || process.env.GROQ_API_KEY
+    });
+    this.maxCycles = config?.maxCycles || 3;
+    this.reasoningModel = "deepseek-r1-distill-llama-70b";
+    this.critiqueModel = "llama-3.3-70b-versatile";
+  }
+
+  private async generateReasoning(prompt: string): Promise<string> {
+    let fullResponse = '';
+    const completion = await this.client.chat.completions.create({
+      model: this.reasoningModel,
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert reasoning engine. Analyze problems step by step, considering multiple angles and implications."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      temperature: 0.6,
+      max_completion_tokens: 1024,
+      top_p: 0.95,
+      stream: true,
+      reasoning_format: "raw"
+    });
+
+    for await (const chunk of completion) {
+      const content = chunk.choices[0]?.delta?.content || "";
+      fullResponse += content;
+    }
+    
+    return fullResponse;
+  }
+
+  private async generateCritique(reasoning: string): Promise<string> {
+    let fullResponse = '';
+    const completion = await this.client.chat.completions.create({
+      model: this.critiqueModel,
+      messages: [
+        {
+          role: "system",
+          content: "You are a critical analyzer. Examine reasoning for logical flaws, gaps, and potential improvements. Be constructive but thorough."
+        },
+        {
+          role: "user",
+          content: `Analyze this reasoning:\n\n${reasoning}\n\nWhat are the potential flaws or areas for improvement?`
+        }
+      ],
+      temperature: 0.5,
+      max_completion_tokens: 1024,
+      top_p: 1,
+      stream: true
+    });
+
+    for await (const chunk of completion) {
+      const content = chunk.choices[0]?.delta?.content || "";
+      fullResponse += content;
+    }
+    
+    return fullResponse;
+  }
+
+  private async refineReasoning(original: string, critique: string): Promise<string> {
+    let fullResponse = '';
+    const completion = await this.client.chat.completions.create({
+      model: this.reasoningModel,
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert at refining and improving reasoning. Address critiques while maintaining logical coherence."
+        },
+        {
+          role: "user",
+          content: `Original reasoning:\n${original}\n\nCritique:\n${critique}\n\nProvide improved reasoning that addresses these points:`
+        }
+      ],
+      temperature: 0.6,
+      max_completion_tokens: 1024,
+      top_p: 0.95,
+      stream: true,
+      reasoning_format: "raw"
+    });
+
+    for await (const chunk of completion) {
+      const content = chunk.choices[0]?.delta?.content || "";
+      fullResponse += content;
+    }
+    
+    return fullResponse;
   }
 
   private formatErrorMessage(error: any): string {
