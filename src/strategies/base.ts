@@ -1,5 +1,5 @@
-import { ThoughtNode, ReasoningRequest, ReasoningResponse } from '../types.js';
-import { StateManager } from '../state.js';
+import { ThoughtNode, ReasoningRequest, ReasoningResponse } from '../../types.js';
+import { StateManager } from '../../state.js';
 
 export interface StrategyMetrics {
   name: string;

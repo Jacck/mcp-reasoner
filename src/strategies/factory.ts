@@ -1,12 +1,12 @@
 import { StateManager } from '../state.js';
 import { Config } from '../types.js';
 import { BaseStrategy } from './base.js';
-import { BeamSearchStrategy } from './beam-search.js';
-import { MonteCarloTreeSearchStrategy } from './mcts.js';
-import { MCTS002AlphaStrategy } from './experiments/mcts-002-alpha.js';
-import { MCTS002AltAlphaStrategy } from './experiments/mcts-002alt-alpha.js';
-import { MCTS003AlphaStrategy } from './experiments/mcts-003-alpha.js';
-import { R1SonnetStrategy } from './r1-sonnet.js';
+import { BeamSearchStrategy } from './search/beam/BeamStrategy.js';
+import { MonteCarloTreeSearchStrategy } from './search/mcts/MCTSStrategy.js';
+import { PolicyGuidedMCTS } from './search/mcts/variants/PolicyGuidedMCTS.js';
+import { BidirectionalMCTS } from './search/mcts/variants/BidirectionalMCTS.js';
+import { GPROMCTS } from './search/mcts/variants/GPROMCTS.js';
+import { GroqStrategy } from './external/GroqStrategy.js';
 
 export enum ReasoningStrategy {
   BEAM_SEARCH = 'beam_search',
