@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { ThoughtNode, ReasoningRequest, ReasoningResponse, CONFIG } from '../../types.js';
-import { MonteCarloTreeSearchStrategy } from '../mcts.js';
+import { ThoughtNode, ReasoningRequest, ReasoningResponse, CONFIG } from '../../../../core/types.js';
+import { MonteCarloTreeSearchStrategy } from '../MCTSStrategy.js';
 
 interface PolicyGuidedNode extends ThoughtNode {
   visits: number;
@@ -29,7 +29,7 @@ interface PolicyMetrics {
   };
 }
 
-export class MCTS002AlphaStrategy extends MonteCarloTreeSearchStrategy {
+export class PolicyGuidedMCTS extends MonteCarloTreeSearchStrategy {
   private readonly temperature: number;
   private explorationRate: number;
   protected readonly learningRate: number;

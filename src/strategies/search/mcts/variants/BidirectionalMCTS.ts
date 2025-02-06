@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { ThoughtNode, ReasoningRequest, ReasoningResponse, CONFIG } from '../../types.js';
-import { MCTS002AlphaStrategy } from './mcts-002-alpha.js';
+import { ThoughtNode, ReasoningRequest, ReasoningResponse, CONFIG } from '../../../../core/types.js';
+import { PolicyGuidedMCTS } from './PolicyGuidedMCTS.js';
 
 // Queue implementation for bidirectional search
 class Queue<T> {
@@ -47,7 +47,7 @@ interface BidirectionalPolicyNode extends ThoughtNode {
   meetingPoint?: boolean;
 }
 
-export class MCTS002AltAlphaStrategy extends MCTS002AlphaStrategy {
+export class BidirectionalMCTS extends PolicyGuidedMCTS {
   private startNode: BidirectionalPolicyNode | null = null;
   private goalNode: BidirectionalPolicyNode | null = null;
   private bidirectionalStats: {

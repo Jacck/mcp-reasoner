@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { ThoughtNode, ReasoningRequest, ReasoningResponse, CONFIG } from '../../types.js';
-import { MCTS002AlphaStrategy } from './mcts-002-alpha.js';
+import { ThoughtNode, ReasoningRequest, ReasoningResponse, CONFIG } from '../../../../core/types.js';
+import { PolicyGuidedMCTS } from './PolicyGuidedMCTS.js';
 
 interface ReasoningPrompt {
   instruction: string;
@@ -67,7 +67,7 @@ interface GPROMetrics {
   };
 }
 
-export class MCTS003AlphaStrategy extends MCTS002AlphaStrategy {
+export class GPROMCTS extends PolicyGuidedMCTS {
   private readonly epsilon: number = 0.2; // PPO clip range
   private readonly entropyCoef: number = 0.01;
   private readonly valueCoef: number = 0.5;
