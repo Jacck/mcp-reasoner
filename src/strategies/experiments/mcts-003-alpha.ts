@@ -283,18 +283,11 @@ export class MCTS003AlphaStrategy extends MCTS002AlphaStrategy {
       currentPrompt: reasoningPrompt.instruction,
       reasoningContext: {
         instruction: `**REASONING PROMPT**\n${reasoningPrompt.instruction}`,
-        context: {
-          currentPath: `**CURRENT PATH**\n${reasoningPrompt.context.currentPath.join('\n')}`,
-          alternativePaths: `**ALTERNATIVE PATHS**\n${reasoningPrompt.context.alternativePaths.join('\n')}`,
-          bestOutcomes: `**BEST OUTCOMES**\n${reasoningPrompt.context.bestOutcomes.join('\n')}`,
-          failedAttempts: `**MISTAKES TO AVOID**\n${reasoningPrompt.context.failedAttempts.join('\n')}`,
-          reasoning: `**REASONING CHAIN**\n${reasoningPrompt.context.reasoning.join('\n')}`
-        },
-        reflection: {
-          mistakes: `**IDENTIFIED MISTAKES**\n${reasoningPrompt.reflection.mistakes.join('\n')}`,
-          improvements: `**SUGGESTED IMPROVEMENTS**\n${reasoningPrompt.reflection.improvements.join('\n')}`,
-          confidence: `**CONFIDENCE SCORE**\n${reasoningPrompt.reflection.confidence}`
-        }
+        currentPath: reasoningPrompt.context.currentPath,
+        alternativePaths: reasoningPrompt.context.alternativePaths,
+        mistakes: reasoningPrompt.reflection.mistakes,
+        improvements: reasoningPrompt.reflection.improvements,
+        confidence: reasoningPrompt.reflection.confidence
       },
       metrics: {
         ...this.gproMetrics,
