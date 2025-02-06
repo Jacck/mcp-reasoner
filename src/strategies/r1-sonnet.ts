@@ -36,8 +36,8 @@ export class R1SonnetStrategy extends BaseStrategy {
         }
       ],
       temperature: 0.6,
-      maxTokens: 1024,
-      topP: 0.95,
+      max_tokens: 1024,
+      top_p: 0.95,
       stream: true
     });
 
@@ -64,8 +64,8 @@ export class R1SonnetStrategy extends BaseStrategy {
         }
       ],
       temperature: 0.5,
-      maxTokens: 1024,
-      topP: 1,
+      max_tokens: 1024,
+      top_p: 1,
       stream: true
     });
 
@@ -92,8 +92,8 @@ export class R1SonnetStrategy extends BaseStrategy {
         }
       ],
       temperature: 0.6,
-      maxTokens: 1024,
-      topP: 0.95,
+      max_tokens: 1024,
+      top_p: 0.95,
       stream: true
     });
 
