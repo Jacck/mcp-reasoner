@@ -105,7 +105,7 @@ export class MCTS003AlphaStrategy extends MCTS002AlphaStrategy {
           const paths = await Promise.all(
             altNodes.map(n => this.stateManager.getPath(n.id))
           );
-          alternatives.push(paths);
+          alternatives.push(...paths);
         }
       }
     }
