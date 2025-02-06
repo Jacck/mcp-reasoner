@@ -123,6 +123,42 @@ export class R1SonnetStrategy extends BaseStrategy {
     return 'An unexpected error occurred while calling the R1 API.';
   }
 
+  private async executeReasoningCycle(
+    initialPrompt: string
+  ): Promise<Array<{
+    thought: string;
+    critique: string;
+    refinement: string;
+    confidence: number;
+  }>> {
+    const cycles = [];
+    let currentThought = await this.generateReasoning(initialPrompt);
+    let confidence = 1.0;
+
+    for (let i = 0; i < this.maxCycles; i++) {
+      // Generate critique of current reasoning
+      const critique = await this.generateCritique(currentThought);
+      
+      // Refine reasoning based on critique
+      const refinement = await this.refineReasoning(currentThought, critique);
+      
+      // Calculate confidence based on changes made
+      confidence *= 0.9; // Decrease confidence with each iteration
+      
+      cycles.push({
+        thought: currentThought,
+        critique,
+        refinement,
+        confidence
+      });
+
+      // Update for next cycle
+      currentThought = refinement;
+    }
+
+    return cycles;
+  }
+
   public async getR1Response(prompt: string): Promise<string> {
     if (!this.apiKey) {
       throw new Error('OPENROUTER_API_KEY environment variable is not set');
