@@ -273,9 +273,37 @@ export class MCTS003AlphaStrategy extends MCTS002AlphaStrategy {
       await this.runGPROOptimization(node);
     }
 
+    // Generate reasoning prompt and reflection
+    const reasoningPrompt = await this.generateReasoningPrompt(node);
+    
     return {
       ...baseResponse,
-      score: this.calculateGPROEnhancedScore(node)
+      thought: node.thought,
+      score: this.calculateGPROEnhancedScore(node),
+      prompts: {
+        instruction: `**REASONING PROMPT**\n${reasoningPrompt.instruction}`,
+        context: {
+          currentPath: `**CURRENT PATH**\n${reasoningPrompt.context.currentPath.join('\n')}`,
+          alternativePaths: `**ALTERNATIVE PATHS**\n${reasoningPrompt.context.alternativePaths.join('\n')}`,
+          bestOutcomes: `**BEST OUTCOMES**\n${reasoningPrompt.context.bestOutcomes.join('\n')}`,
+          failedAttempts: `**MISTAKES TO AVOID**\n${reasoningPrompt.context.failedAttempts.join('\n')}`,
+          reasoning: `**REASONING CHAIN**\n${reasoningPrompt.context.reasoning.join('\n')}`
+        },
+        reflection: {
+          mistakes: `**IDENTIFIED MISTAKES**\n${reasoningPrompt.reflection.mistakes.join('\n')}`,
+          improvements: `**SUGGESTED IMPROVEMENTS**\n${reasoningPrompt.reflection.improvements.join('\n')}`,
+          confidence: `**CONFIDENCE SCORE**\n${reasoningPrompt.reflection.confidence}`
+        }
+      },
+      metrics: {
+        ...this.gproMetrics,
+        nodeStats: {
+          advantageEstimate: node.advantageEstimate,
+          entropyBonus: node.entropyBonus,
+          proximityScore: node.proximityScore,
+          trustRegionViolation: node.trustRegionViolation
+        }
+      }
     };
   }
 
