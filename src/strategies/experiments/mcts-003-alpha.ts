@@ -2,6 +2,22 @@ import { v4 as uuidv4 } from 'uuid';
 import { ThoughtNode, ReasoningRequest, ReasoningResponse, CONFIG } from '../../types.js';
 import { MCTS002AlphaStrategy } from './mcts-002-alpha.js';
 
+interface ReasoningPrompt {
+  instruction: string;
+  context: {
+    currentPath: string[];
+    alternativePaths: string[];
+    bestOutcomes: string[];
+    failedAttempts: string[];
+    reasoning: string[];
+  };
+  reflection: {
+    mistakes: string[];
+    improvements: string[];
+    confidence: number;
+  };
+}
+
 interface GPROPolicyNode extends ThoughtNode {
   visits: number;
   totalReward: number;
@@ -20,6 +36,12 @@ interface GPROPolicyNode extends ThoughtNode {
   kl_div: number;
   trustRegionViolation?: boolean;
   importanceSamplingRatio?: number;
+  // Prompting additions
+  prompts?: ReasoningPrompt[];
+  reflections?: string[];
+  confidence: number;
+  mistakeHistory?: string[];
+  improvements?: string[];
 }
 
 interface GPROMetrics {
@@ -58,6 +80,48 @@ export class MCTS003AlphaStrategy extends MCTS002AlphaStrategy {
     this.gproMetrics = this.initializeGPROMetrics();
   }
 
+  private async generateReasoningPrompt(node: GPROPolicyNode): Promise<ReasoningPrompt> {
+    const path = await this.stateManager.getPath(node.id);
+    const alternatives = await this.getAlternativePaths(node);
+    const mistakes = await this.analyzeMistakes(path);
+    
+    return {
+      instruction: this.constructPromptInstruction(node, mistakes),
+      context: {
+        currentPath: path.map(n => n.thought),
+        alternativePaths: alternatives.map(p => p.map(n => n.thought)),
+        bestOutcomes: await this.getBestOutcomes(node),
+        failedAttempts: mistakes,
+        reasoning: path.map(n => (n as GPROPolicyNode).reflections || []).flat()
+      },
+      reflection: {
+        mistakes: mistakes,
+        improvements: await this.suggestImprovements(node),
+        confidence: node.confidence
+      }
+    };
+  }
+
+  private constructPromptInstruction(node: GPROPolicyNode, mistakes: string[]): string {
+    let prompt = `Let's carefully analyze the current reasoning path:\n\n`;
+    
+    if (mistakes.length > 0) {
+      prompt += `Previous mistakes to avoid:\n${mistakes.join('\n')}\n\n`;
+    }
+
+    prompt += `Current thought: "${node.thought}"\n\n`;
+    prompt += `Consider these aspects:\n`;
+    prompt += `1. Is this reasoning step logically sound?\n`;
+    prompt += `2. What alternative approaches might be better?\n`;
+    prompt += `3. How does this connect to the overall goal?\n\n`;
+    
+    if (node.valueEstimate < 0.5) {
+      prompt += `The current path seems suboptimal. Consider backtracking or exploring alternatives.\n`;
+    }
+
+    return prompt;
+  }
+
   private initializeGPROMetrics(): GPROMetrics {
     return {
       policyLoss: 0,
@@ -90,6 +154,7 @@ export class MCTS003AlphaStrategy extends MCTS002AlphaStrategy {
     const parentNode = request.parentId ? 
       await this.getNode(request.parentId) as GPROPolicyNode : undefined;
 
+    // Generate initial node
     const node: GPROPolicyNode = {
       id: nodeId,
       thought: request.thought,
