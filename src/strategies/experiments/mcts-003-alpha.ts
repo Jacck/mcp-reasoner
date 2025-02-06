@@ -301,7 +301,7 @@ export class MCTS003AlphaStrategy extends MCTS002AlphaStrategy {
           advantageEstimate: node.advantageEstimate,
           entropyBonus: node.entropyBonus,
           proximityScore: node.proximityScore,
-          trustRegionViolation: node.trustRegionViolation
+          trustRegionViolation: node.trustRegionViolation || false
         }
       }
     };
