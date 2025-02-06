@@ -1,4 +1,4 @@
-import { ThoughtNode, ReasoningRequest, ReasoningResponse, CONFIG } from '../../../../core/types.js';
+import { ThoughtNode, ReasoningRequest, ReasoningResponse, DEFAULT_CONFIG } from '../../../../core/types.js';
 import { PolicyGuidedMCTS } from './PolicyGuidedMCTS.js';
 import { v4 as uuidv4 } from 'uuid';
 import { v4 as uuidv4 } from 'uuid';
@@ -58,7 +58,7 @@ export class BidirectionalMCTS extends PolicyGuidedMCTS {
     pathQuality: number;
   };
 
-  constructor(stateManager: any, numSimulations: number = CONFIG.numSimulations) {
+  constructor(stateManager: any, numSimulations: number = DEFAULT_CONFIG.numSimulations) {
     super(stateManager, numSimulations);
     this.bidirectionalStats = {
       forwardExplorationRate: Math.sqrt(2),

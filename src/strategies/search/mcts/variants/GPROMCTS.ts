@@ -3,7 +3,7 @@ import {
   ThoughtNode,
   ReasoningRequest,
   ReasoningResponse,
-  CONFIG,
+  DEFAULT_CONFIG,
 } from "../../../../core/types.js";
 import { PolicyGuidedMCTS } from "./PolicyGuidedMCTS.js";
 
@@ -83,7 +83,7 @@ export class GPROMCTS extends PolicyGuidedMCTS {
 
   constructor(
     stateManager: any,
-    numSimulations: number = CONFIG.numSimulations,
+    numSimulations: number = DEFAULT_CONFIG.numSimulations,
   ) {
     super(stateManager, numSimulations);
     this.gproMetrics = this.initializeGPROMetrics();
