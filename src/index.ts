@@ -139,24 +139,24 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const stats = await reasoner.getStats();
 
       // Return enhanced response
+      // Format the reasoning context as a prefill for Claude
+      const reasoningPrefill = response.reasoningContext ? 
+        `${response.currentPrompt}\n\n` +
+        `Previous reasoning steps:\n${response.reasoningContext.currentPath.join('\n')}\n\n` +
+        `Alternative approaches considered:\n${response.reasoningContext.alternativePaths.join('\n')}\n\n` +
+        `Mistakes to avoid:\n${response.reasoningContext.mistakes.join('\n')}\n\n` +
+        `Suggested improvements:\n${response.reasoningContext.improvements.join('\n')}\n\n` +
+        `Confidence: ${response.reasoningContext.confidence}\n\n` +
+        `Based on this context, please continue with the next reasoning step.` : '';
+
       const result = {
         thoughtNumber: step.thoughtNumber,
         totalThoughts: step.totalThoughts,
         nextThoughtNeeded: step.nextThoughtNeeded,
-        thought: step.thought,
+        thought: reasoningPrefill + '\n\n' + step.thought,
         nodeId: response.nodeId,
         score: response.score,
         strategyUsed: response.strategyUsed,
-        currentPrompt: response.currentPrompt ? 
-          `**CURRENT PROMPT**\n${response.currentPrompt}` : undefined,
-        reasoningContext: response.reasoningContext ? {
-          instruction: `**REASONING INSTRUCTION**\n${response.reasoningContext.instruction}`,
-          currentPath: `**CURRENT PATH**\n${response.reasoningContext.currentPath.join('\n')}`,
-          alternativePaths: `**ALTERNATIVE PATHS**\n${response.reasoningContext.alternativePaths.join('\n')}`,
-          mistakes: `**IDENTIFIED MISTAKES**\n${response.reasoningContext.mistakes.join('\n')}`,
-          improvements: `**SUGGESTED IMPROVEMENTS**\n${response.reasoningContext.improvements.join('\n')}`,
-          confidence: `**CONFIDENCE SCORE**\n${response.reasoningContext.confidence}`
-        } : undefined,
         stats: {
           totalNodes: stats.totalNodes,
           averageScore: stats.averageScore,
