@@ -34,6 +34,11 @@ export class Reasoner {
       ReasoningStrategy.MCTS_002_ALT_ALPHA,
       StrategyFactory.createStrategy(ReasoningStrategy.MCTS_002_ALT_ALPHA, this.stateManager, undefined, mergedConfig.numSimulations, mergedConfig)
     );
+    
+    this.strategies.set(
+      ReasoningStrategy.MCTS_003_ALPHA,
+      StrategyFactory.createStrategy(ReasoningStrategy.MCTS_003_ALPHA, this.stateManager, undefined, mergedConfig.numSimulations, mergedConfig)
+    );
 
     // Set default strategy
     const defaultStrategy = mergedConfig.defaultStrategy as ReasoningStrategy;
