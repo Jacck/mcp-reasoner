@@ -163,31 +163,57 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           `Based on this context, please continue with the next reasoning step.`
         : "";
 
-      const result = {
-        thoughtNumber: step.thoughtNumber,
-        totalThoughts: step.totalThoughts,
-        nextThoughtNeeded: step.nextThoughtNeeded,
-        thought: reasoningPrefill + "\n\n" + step.thought,
-        nodeId: response.nodeId,
-        score: response.score,
-        strategyUsed: response.strategyUsed,
-        stats: {
-          totalNodes: stats.totalNodes,
-          averageScore: stats.averageScore,
-          maxDepth: stats.maxDepth,
-          branchingFactor: stats.branchingFactor,
-          strategyMetrics: stats.strategyMetrics,
-        },
-      };
+      try {
+        // Sanitize values to ensure they're JSON-safe
+        const sanitizedStats = {
+          totalNodes: Number(stats.totalNodes) || 0,
+          averageScore: Number(stats.averageScore) || 0,
+          maxDepth: Number(stats.maxDepth) || 0,
+          branchingFactor: Number(stats.branchingFactor) || 0,
+          strategyMetrics: stats.strategyMetrics || {}
+        };
 
-      return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(result),
-          },
-        ],
-      };
+        const result = {
+          thoughtNumber: Number(step.thoughtNumber),
+          totalThoughts: Number(step.totalThoughts),
+          nextThoughtNeeded: Boolean(step.nextThoughtNeeded),
+          thought: String(reasoningPrefill + "\n\n" + step.thought),
+          nodeId: String(response.nodeId),
+          score: Number(response.score) || 0,
+          strategyUsed: String(response.strategyUsed || ''),
+          stats: sanitizedStats
+        };
+
+        // Validate the result can be properly stringified
+        const jsonString = JSON.stringify(result, (key, value) => {
+          if (value === undefined) return null;
+          if (typeof value === 'number' && !isFinite(value)) return 0;
+          return value;
+        });
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: jsonString
+            }
+          ]
+        };
+      } catch (error) {
+        console.error('Error formatting response:', error);
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                error: "Failed to format response",
+                thought: step.thought,
+                success: false
+              })
+            }
+          ]
+        };
+      }
     } else if (request.params.name === "mcp-reasoner-r1") {
       try {
         console.log("R1 request received:", request.params.arguments);
