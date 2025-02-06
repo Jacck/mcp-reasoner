@@ -1,7 +1,8 @@
-import { ThoughtNode, ReasoningRequest, ReasoningResponse, ReasoningStats, CONFIG, Config } from './types.js';
+import { ThoughtNode, ReasoningRequest, ReasoningResponse, ReasoningStats, CONFIG, Config } from './core/types.js';
 import { StateManager } from './state.js';
 import { StrategyFactory, ReasoningStrategy } from './strategies/factory.js';
-import { BaseStrategy, StrategyMetrics } from './strategies/base.js';
+import { BaseStrategy } from './strategies/base/BaseStrategy.js';
+import { StrategyMetrics } from './core/types.js';
 
 export class Reasoner {
   private stateManager: StateManager;

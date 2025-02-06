@@ -1,6 +1,6 @@
 import { StateManager } from '../state.js';
-import { Config } from '../types.js';
-import { BaseStrategy } from './base.js';
+import { Config } from '../core/types.js';
+import { BaseStrategy } from './base/BaseStrategy.js';
 import { BeamSearchStrategy } from './search/beam/BeamStrategy.js';
 import { MonteCarloTreeSearchStrategy } from './search/mcts/MCTSStrategy.js';
 import { PolicyGuidedMCTS } from './search/mcts/variants/PolicyGuidedMCTS.js';

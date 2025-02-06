@@ -7,7 +7,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { Reasoner } from "./reasoner.js";
 import { ReasoningStrategy } from "./strategies/factory.js";
-import { R1SonnetStrategy } from "./strategies/r1-sonnet.js";
+import { GroqStrategy } from "./strategies/external/GroqStrategy.js";
 
 // Initialize server
 const server = new Server(
