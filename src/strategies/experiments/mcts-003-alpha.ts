@@ -94,7 +94,7 @@ export class MCTS003AlphaStrategy extends MCTS002AlphaStrategy {
     });
     
     // Find alternative paths
-    const alternatives: string[][] = [];
+    const alternatives: ThoughtNode[][] = [];
     for (const [depth, nodes] of nodesByDepth) {
       if (depth <= node.depth) {
         const altNodes = nodes.filter(n => 
@@ -103,10 +103,7 @@ export class MCTS003AlphaStrategy extends MCTS002AlphaStrategy {
         );
         if (altNodes.length > 0) {
           const paths = await Promise.all(
-            altNodes.map(async n => {
-              const path = await this.stateManager.getPath(n.id);
-              return path.map(p => p.thought);
-            })
+            altNodes.map(n => this.stateManager.getPath(n.id))
           );
           alternatives.push(paths);
         }
@@ -177,7 +174,7 @@ export class MCTS003AlphaStrategy extends MCTS002AlphaStrategy {
       instruction: this.constructPromptInstruction(node, mistakes),
       context: {
         currentPath: path.map(n => n.thought),
-        alternativePaths: alternatives.map(p => p.map(n => n.thought)),
+        alternativePaths: alternatives.flat().map(n => n.thought),
         bestOutcomes: await this.getBestOutcomes(node),
         failedAttempts: mistakes,
         reasoning: path.map(n => (n as GPROPolicyNode).reflections || []).flat()
