@@ -31,13 +31,13 @@ export class StrategyFactory {
       case ReasoningStrategy.MCTS:
         return new MonteCarloTreeSearchStrategy(stateManager, numSimulations);
       case ReasoningStrategy.MCTS_002_ALPHA:
-        return new MCTS002AlphaStrategy(stateManager, numSimulations);
+        return new PolicyGuidedMCTS(stateManager, numSimulations);
       case ReasoningStrategy.MCTS_002_ALT_ALPHA:
-        return new MCTS002AltAlphaStrategy(stateManager, numSimulations);
+        return new BidirectionalMCTS(stateManager, numSimulations);
       case ReasoningStrategy.R1_SONNET:
-        return new R1SonnetStrategy(stateManager);
+        return new GroqStrategy(stateManager);
       case ReasoningStrategy.MCTS_003_ALPHA:
-        return new MCTS003AlphaStrategy(stateManager, numSimulations);
+        return new GPROMCTS(stateManager, numSimulations);
       default:
         throw new Error(`Unknown strategy type: ${type}`);
     }

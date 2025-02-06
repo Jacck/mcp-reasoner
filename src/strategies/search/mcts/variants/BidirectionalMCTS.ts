@@ -1,6 +1,7 @@
-import { v4 as uuidv4 } from 'uuid';
 import { ThoughtNode, ReasoningRequest, ReasoningResponse, CONFIG } from '../../../../core/types.js';
 import { PolicyGuidedMCTS } from './PolicyGuidedMCTS.js';
+import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 // Queue implementation for bidirectional search
 class Queue<T> {
