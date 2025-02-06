@@ -28,11 +28,11 @@ export class R1SonnetStrategy extends BaseStrategy {
       messages: [
         {
           role: "system",
-          content: "You are an expert reasoning engine. Analyze problems step by step, considering multiple angles and implications."
+          content: "You are an expert reasoning engine. Analyze problems step by step, considering multiple angles and implications. Format your response as a clear list of points, using bullet points or numbers for each distinct thought or step."
         },
         {
           role: "user",
-          content: prompt
+          content: `Please analyze this step by step, using bullet points:\n\n${prompt}`
         }
       ],
       temperature: 0.6,
@@ -56,11 +56,11 @@ export class R1SonnetStrategy extends BaseStrategy {
       messages: [
         {
           role: "system",
-          content: "You are a critical analyzer. Examine reasoning for logical flaws, gaps, and potential improvements. Be constructive but thorough."
+          content: "You are a critical analyzer. Examine reasoning for logical flaws, gaps, and potential improvements. Be constructive but thorough. Format your critique as a clear list using bullet points."
         },
         {
           role: "user",
-          content: `Analyze this reasoning:\n\n${reasoning}\n\nWhat are the potential flaws or areas for improvement?`
+          content: `Analyze this reasoning and list your critiques using bullet points:\n\n${reasoning}\n\nWhat are the potential flaws or areas for improvement?`
         }
       ],
       temperature: 0.5,
@@ -84,11 +84,11 @@ export class R1SonnetStrategy extends BaseStrategy {
       messages: [
         {
           role: "system",
-          content: "You are an expert at refining and improving reasoning. Address critiques while maintaining logical coherence."
+          content: "You are an expert at refining and improving reasoning. Address critiques while maintaining logical coherence. Format your improved reasoning as a clear list using bullet points."
         },
         {
           role: "user",
-          content: `Original reasoning:\n${original}\n\nCritique:\n${critique}\n\nProvide improved reasoning that addresses these points:`
+          content: `Original reasoning:\n${original}\n\nCritique:\n${critique}\n\nProvide improved reasoning that addresses these points, using bullet points for each step or thought:`
         }
       ],
       temperature: 0.6,
