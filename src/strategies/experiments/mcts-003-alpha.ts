@@ -94,7 +94,7 @@ export class MCTS003AlphaStrategy extends MCTS002AlphaStrategy {
     });
     
     // Find alternative paths
-    const alternatives: ThoughtNode[][] = [];
+    const alternatives: string[][] = [];
     for (const [depth, nodes] of nodesByDepth) {
       if (depth <= node.depth) {
         const altNodes = nodes.filter(n => 
@@ -102,9 +102,13 @@ export class MCTS003AlphaStrategy extends MCTS002AlphaStrategy {
           n.score > 0.5
         );
         if (altNodes.length > 0) {
-          alternatives.push(await Promise.all(
-            altNodes.map(n => this.stateManager.getPath(n.id))
-          ));
+          const paths = await Promise.all(
+            altNodes.map(async n => {
+              const path = await this.stateManager.getPath(n.id);
+              return path.map(p => p.thought);
+            })
+          );
+          alternatives.push(paths);
         }
       }
     }

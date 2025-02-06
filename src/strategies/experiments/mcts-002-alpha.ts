@@ -32,7 +32,7 @@ interface PolicyMetrics {
 export class MCTS002AlphaStrategy extends MonteCarloTreeSearchStrategy {
   private readonly temperature: number;
   private explorationRate: number;
-  private readonly learningRate: number;
+  protected readonly learningRate: number;
   private readonly noveltyBonus: number;
   private policyMetrics: PolicyMetrics;
   protected readonly simulationCount: number;
