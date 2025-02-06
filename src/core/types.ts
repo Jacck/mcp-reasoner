@@ -106,24 +106,3 @@ export interface ReasoningStats extends BaseMetrics {
 }
 
 export * from './base-types';
-
-// Move Config interface and DEFAULT_CONFIG here since they're core types
-export interface Config {
-  beamWidth: number;
-  maxDepth: number;
-  minScore: number;
-  temperature: number;
-  cacheSize: number;
-  defaultStrategy: string;
-  numSimulations: number;
-}
-
-export const DEFAULT_CONFIG: Config = {
-  beamWidth: 3,
-  maxDepth: 5,
-  minScore: 0.5,
-  temperature: 0.7,
-  cacheSize: 1000,
-  defaultStrategy: 'beam_search',
-  numSimulations: 50
-};
