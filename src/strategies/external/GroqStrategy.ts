@@ -2,7 +2,7 @@ import { BaseStrategy } from "../base/BaseStrategy.js";
 import { ReasoningRequest, ReasoningResponse } from "../../core/types.js";
 import Groq from "groq-sdk";
 
-export class R1SonnetStrategy extends BaseStrategy {
+export class GroqStrategy extends BaseStrategy {
   private client: Groq;
   private maxCycles: number;
   private reasoningModel: string;

@@ -58,7 +58,15 @@ export const DEFAULT_CONFIG: Config = {
   defaultStrategy: 'beam_search',
   numSimulations: 50
 };
-import { BaseNode, BaseRequest, BaseResponse, BaseMetrics } from './base-types';
+
+export interface StrategyMetrics {
+  name: string;
+  nodesExplored: number;
+  averageScore: number;
+  maxDepth: number;
+  active?: boolean;
+  [key: string]: number | string | boolean | undefined;
+}
 
 // Strategy-specific extensions of base types
 export interface ThoughtNode extends BaseNode {

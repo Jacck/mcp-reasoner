@@ -216,13 +216,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
     } else if (request.params.name === "mcp-reasoner-r1") {
       try {
-        const r1Strategy = new R1SonnetStrategy(null);
+        const r1Strategy = new GroqStrategy(null);
         const cycles = await r1Strategy.executeReasoningCycle(
           request.params.arguments.prompt
         );
 
         // Format the response with clear sections
-        const formattedResponse = cycles.map((cycle, index) => 
+        const formattedResponse = cycles.map((cycle: { thought: string; critique: string; refinement: string; confidence: number }, index: number) => 
           `**REASONING CYCLE ${index + 1}**\n\n` +
           `Initial Thought:\n${cycle.thought}\n\n` +
           `Critique:\n${cycle.critique}\n\n` +
