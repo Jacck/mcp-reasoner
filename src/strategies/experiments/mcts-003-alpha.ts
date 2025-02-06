@@ -280,7 +280,8 @@ export class MCTS003AlphaStrategy extends MCTS002AlphaStrategy {
       ...baseResponse,
       thought: node.thought,
       score: this.calculateGPROEnhancedScore(node),
-      prompts: {
+      currentPrompt: reasoningPrompt.instruction,
+      reasoningContext: {
         instruction: `**REASONING PROMPT**\n${reasoningPrompt.instruction}`,
         context: {
           currentPath: `**CURRENT PATH**\n${reasoningPrompt.context.currentPath.join('\n')}`,

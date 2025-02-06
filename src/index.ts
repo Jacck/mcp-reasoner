@@ -147,6 +147,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         nodeId: response.nodeId,
         score: response.score,
         strategyUsed: response.strategyUsed,
+        currentPrompt: response.currentPrompt ? 
+          `**CURRENT PROMPT**\n${response.currentPrompt}` : undefined,
+        reasoningContext: response.reasoningContext ? {
+          instruction: `**REASONING INSTRUCTION**\n${response.reasoningContext.instruction}`,
+          currentPath: `**CURRENT PATH**\n${response.reasoningContext.currentPath.join('\n')}`,
+          alternativePaths: `**ALTERNATIVE PATHS**\n${response.reasoningContext.alternativePaths.join('\n')}`,
+          mistakes: `**IDENTIFIED MISTAKES**\n${response.reasoningContext.mistakes.join('\n')}`,
+          improvements: `**SUGGESTED IMPROVEMENTS**\n${response.reasoningContext.improvements.join('\n')}`,
+          confidence: `**CONFIDENCE SCORE**\n${response.reasoningContext.confidence}`
+        } : undefined,
         stats: {
           totalNodes: stats.totalNodes,
           averageScore: stats.averageScore,

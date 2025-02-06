@@ -29,6 +29,15 @@ export interface ReasoningResponse {
   possiblePaths?: number;
   bestScore?: number;
   strategyUsed?: string;
+  currentPrompt?: string;
+  reasoningContext?: {
+    instruction: string;
+    currentPath: string[];
+    alternativePaths: string[];
+    mistakes: string[];
+    improvements: string[];
+    confidence: number;
+  };
   prompts?: {
     instruction: string;
     context: {
