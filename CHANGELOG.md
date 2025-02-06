@@ -7,16 +7,40 @@ Note: Changelog is not complete and may be updated at any time for any reason. R
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.2.0] - 2025-02-10
+## [2.3.0] - 2025-02-06
 
 ### Added
-- MCTS-003-Alpha strategy with GPRO implementation
-  - Guided Policy with Recursive Optimization
-  - Enhanced policy network architecture
-  - Dynamic exploration/exploitation balancing
-  - Improved path selection through recursive optimization
-- Extended documentation for GPRO technical details
-- New benchmarking metrics for policy evaluation
+- Major codebase cleanup and reorganization
+  - Improved directory structure
+  - Better type safety
+  - Cleaner strategy implementations
+- Enhanced GPRO implementation
+  - Improved prompting system
+  - Better reasoning context handling
+  - Enhanced metrics collection
+- Groq integration improvements
+  - Switched from OpenRouter to direct Groq SDK
+  - Added streaming support
+  - Enhanced error handling
+  - Better response formatting
+
+### Changed
+- Refactored strategy hierarchy
+  - Cleaner inheritance structure
+  - Better separation of concerns
+  - Improved type definitions
+- Updated configuration handling
+  - Centralized config management
+  - Better default values
+  - Improved type safety
+
+### Fixed
+- Various TypeScript type issues
+- JSON handling in responses
+- Strategy switching logic
+- Metrics collection accuracy
+
+## [2.2.0] - 2025-02-10
 
 ## [2.1.0] - 2025-01-27
 

@@ -154,16 +154,37 @@ const bestPath = await reasoner.getBestPath();
    - Problem has clear sequential progression
    - Limited branching possibilities
    - Need for focused, linear analysis
+   - Quick convergence is priority
 
 2. **Use MCTS When**:
    - Multiple valid solution paths exist
    - Need to explore parallel possibilities
    - Complex interaction between choices
+   - Exploration/exploitation balance needed
 
-3. **Use MCTS Alpha When**:
-   - Long-term consequences are critical
+3. **Use Policy-Guided MCTS When**:
    - Need sophisticated pattern recognition
-   - Complex technical problems requiring strategic thinking
+   - Learning from previous reasoning paths
+   - Value estimation is important
+   - Policy-based guidance beneficial
+
+4. **Use Bidirectional MCTS When**:
+   - Clear start and goal states exist
+   - Efficient path finding is priority
+   - Need to meet in the middle
+   - Complex search space navigation
+
+5. **Use GPRO MCTS When**:
+   - Need advanced policy optimization
+   - Trust region constraints important
+   - Sophisticated value estimation needed
+   - Complex reasoning refinement required
+
+6. **Use Groq Integration When**:
+   - External model reasoning needed
+   - Multi-step refinement beneficial
+   - Critical analysis required
+   - Need for structured critique
 
 ## Performance Considerations
 

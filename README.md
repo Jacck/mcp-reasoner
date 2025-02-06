@@ -1,8 +1,8 @@
 # MCP Reasoner
-A reasoning implementation for Claude Desktop that lets you use both Beam Search and Monte Carlo Tree Search (MCTS). tbh this started as a way to see if we could make Claude even better at complex problem-solving... turns out we definitely can.
+A reasoning implementation for Claude Desktop that lets you use both Beam Search and Monte Carlo Tree Search (MCTS). A sophisticated tool for enhancing Claude's problem-solving capabilities through structured reasoning strategies.
 
 ### Current Version:
-**v2.1.0**
+**v2.3.0**
 
 #### What's New:
 
@@ -60,13 +60,24 @@ A reasoning implementation for Claude Desktop that lets you use both Beam Search
 
 
 ## Features
-- Two search strategies that you can switch between:
-   - Beam search (good for straightforward stuff)
-   - MCTS (when stuff gets complex) with alpha variations (see above)
-- Tracks how good different reasoning paths are
-- Maps out all the different ways Claude thinks through problems
-- Analyzes how the reasoning process went
-- Follows the MCP protocol (obviously)
+- Multiple sophisticated reasoning strategies:
+   - Beam Search: Optimized for linear, sequential reasoning
+   - MCTS: Enhanced tree search for complex problem spaces
+   - Policy-Guided MCTS: Advanced policy network integration
+   - Bidirectional MCTS: Efficient path exploration
+   - GPRO MCTS: State-of-the-art policy optimization
+   - Groq Integration: External model reasoning support
+- Comprehensive reasoning analysis:
+   - Path quality evaluation
+   - Alternative path exploration
+   - Reasoning critique and refinement
+   - Detailed metrics collection
+- Advanced features:
+   - Dynamic strategy switching
+   - Adaptive exploration rates
+   - Trust region optimization
+   - Streaming response support
+- Full MCP protocol compliance
 
 ## Installation
 ```
