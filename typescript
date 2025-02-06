@@ -1,0 +1,172 @@
+// Base interfaces for the reasoning system
+export interface BaseNode {
+  id: string;
+  thought: string;
+  score: number;
+  depth: number;
+  children: string[];
+  parentId?: string;
+  isComplete: boolean;
+}
+
+export interface BaseRequest {
+  thought: string;
+  thoughtNumber: number;
+  totalThoughts: number;
+  nextThoughtNeeded: boolean;
+  parentId?: string;
+  strategyType?: string;
+}
+
+export interface BaseResponse {
+  nodeId: string;
+  thought: string;
+  score: number;
+  depth: number;
+  isComplete: boolean;
+  nextThoughtNeeded: boolean;
+  possiblePaths?: number;
+  bestScore?: number;
+  strategyUsed?: string;
+}
+
+export interface BaseMetrics {
+  totalNodes: number;
+  averageScore: number;
+  maxDepth: number;
+  branchingFactor: number;
+  strategyMetrics?: Record<string, any>;
+}
+
+export interface Config {
+  beamWidth: number;
+  maxDepth: number;
+  minScore: number;
+  temperature: number;
+  cacheSize: number;
+  defaultStrategy: string;
+  numSimulations: number;
+}
+
+export const DEFAULT_CONFIG: Config = {
+  beamWidth: 3,
+  maxDepth: 10,
+  minScore: 0.5,
+  temperature: 1.0,
+  cacheSize: 1000,
+  defaultStrategy: 'beam_search',
+  numSimulations: 50
+};
+
+// Strategy-specific interfaces
+export interface PolicyNode extends BaseNode {
+  policyScore: number;
+  valueEstimate: number;
+  visits: number;
+  totalReward: number;
+}
+
+export interface SearchNode extends BaseNode {
+  g: number; // Cost from start
+  h: number; // Heuristic to goal
+  f: number; // Total estimated cost
+}
+
+export interface ReasoningContext {
+  previousSteps: string[];
+  alternatives: string[];
+  metrics: BaseMetrics;
+  confidence: number;
+}
+import { BaseNode, BaseMetrics, PolicyNode } from '../core/types';
+
+export function calculateBaseMetrics(nodes: BaseNode[]): BaseMetrics {
+  if (nodes.length === 0) {
+    return {
+      totalNodes: 0,
+      averageScore: 0,
+      maxDepth: 0,
+      branchingFactor: 0
+    };
+  }
+
+  const scores = nodes.map(n => n.score);
+  const depths = nodes.map(n => n.depth);
+  const branchingFactors = nodes.map(n => n.children.length);
+
+  return {
+    totalNodes: nodes.length,
+    averageScore: scores.reduce((a, b) => a + b, 0) / scores.length,
+    maxDepth: Math.max(...depths),
+    branchingFactor: branchingFactors.reduce((a, b) => a + b, 0) / nodes.length
+  };
+}
+
+export function calculatePolicyMetrics(nodes: PolicyNode[]): Record<string, number> {
+  if (nodes.length === 0) return {};
+
+  const policyScores = nodes.map(n => n.policyScore);
+  const valueEstimates = nodes.map(n => n.valueEstimate);
+  const visits = nodes.map(n => n.visits);
+
+  return {
+    averagePolicyScore: policyScores.reduce((a, b) => a + b, 0) / policyScores.length,
+    averageValueEstimate: valueEstimates.reduce((a, b) => a + b, 0) / valueEstimates.length,
+    totalVisits: visits.reduce((a, b) => a + b, 0),
+    averageVisitsPerNode: visits.reduce((a, b) => a + b, 0) / visits.length
+  };
+}
+import { BaseNode, PolicyNode } from '../core/types';
+
+export function evaluateThought(node: BaseNode, parent?: BaseNode): number {
+  const logicalScore = calculateLogicalScore(node, parent);
+  const depthPenalty = calculateDepthPenalty(node);
+  const completionBonus = node.isComplete ? 0.2 : 0;
+  
+  return (logicalScore + depthPenalty + completionBonus) / 3;
+}
+
+export function evaluatePolicyNode(node: PolicyNode, parent?: PolicyNode): number {
+  const baseScore = evaluateThought(node, parent);
+  const policyBonus = node.policyScore * 0.3;
+  const valueBonus = node.valueEstimate * 0.2;
+  
+  return (baseScore + policyBonus + valueBonus) / 3;
+}
+
+function calculateLogicalScore(node: BaseNode, parent?: BaseNode): number {
+  let score = 0;
+  
+  // Length and complexity
+  score += Math.min(node.thought.length / 200, 0.3);
+  
+  // Logical connectors
+  if (/\b(therefore|because|if|then|thus|hence|so)\b/i.test(node.thought)) {
+    score += 0.2;
+  }
+  
+  // Mathematical/logical expressions
+  if (/[+\-*/=<>]/.test(node.thought)) {
+    score += 0.2;
+  }
+  
+  // Parent-child coherence
+  if (parent) {
+    const coherence = calculateCoherence(parent.thought, node.thought);
+    score += coherence * 0.3;
+  }
+  
+  return score;
+}
+
+function calculateDepthPenalty(node: BaseNode): number {
+  return Math.max(0, 1 - (node.depth / 10) * 0.3);
+}
+
+function calculateCoherence(parentThought: string, childThought: string): number {
+  const parentTerms = new Set(parentThought.toLowerCase().split(/\W+/));
+  const childTerms = childThought.toLowerCase().split(/\W+/);
+  
+  const sharedTerms = childTerms.filter(term => parentTerms.has(term)).length;
+  return Math.min(sharedTerms / childTerms.length, 1);
+}

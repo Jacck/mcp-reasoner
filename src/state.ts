@@ -1,4 +1,4 @@
-import { ThoughtNode } from './types.js';
+import { ThoughtNode } from './core/types.js';
 
 class LRUCache<K, V> {
   private cache = new Map<K, V>();

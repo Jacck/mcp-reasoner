@@ -1,15 +1,17 @@
-import { ThoughtNode, ReasoningRequest, ReasoningResponse, ReasoningStats, CONFIG } from './types.js';
+import { ThoughtNode, ReasoningRequest, ReasoningResponse, ReasoningStats, Config, DEFAULT_CONFIG } from './core/types.js';
 import { StateManager } from './state.js';
 import { StrategyFactory, ReasoningStrategy } from './strategies/factory.js';
-import { BaseStrategy, StrategyMetrics } from './strategies/base.js';
+import { BaseStrategy } from './strategies/base/BaseStrategy.js';
+import { StrategyMetrics } from './core/types.js';
 
 export class Reasoner {
   private stateManager: StateManager;
   private currentStrategy: BaseStrategy;
   private strategies: Map<ReasoningStrategy, BaseStrategy>;
 
-  constructor() {
-    this.stateManager = new StateManager(CONFIG.cacheSize);
+  constructor(config: Partial<Config> = {}) {
+    const mergedConfig = { ...DEFAULT_CONFIG, ...config };
+    this.stateManager = new StateManager(mergedConfig.cacheSize);
     
     // Initialize available strategies
     this.strategies = new Map();
@@ -17,25 +19,30 @@ export class Reasoner {
     // Initialize base strategies
     this.strategies.set(
       ReasoningStrategy.BEAM_SEARCH,
-      StrategyFactory.createStrategy(ReasoningStrategy.BEAM_SEARCH, this.stateManager, CONFIG.beamWidth)
+      StrategyFactory.createStrategy(ReasoningStrategy.BEAM_SEARCH, this.stateManager, mergedConfig.beamWidth, undefined, mergedConfig)
     );
     this.strategies.set(
       ReasoningStrategy.MCTS,
-      StrategyFactory.createStrategy(ReasoningStrategy.MCTS, this.stateManager, undefined, CONFIG.numSimulations)
+      StrategyFactory.createStrategy(ReasoningStrategy.MCTS, this.stateManager, undefined, mergedConfig.numSimulations, mergedConfig)
     );
     
     // Initialize experimental MCTS strategies
     this.strategies.set(
       ReasoningStrategy.MCTS_002_ALPHA,
-      StrategyFactory.createStrategy(ReasoningStrategy.MCTS_002_ALPHA, this.stateManager, undefined, CONFIG.numSimulations)
+      StrategyFactory.createStrategy(ReasoningStrategy.MCTS_002_ALPHA, this.stateManager, undefined, mergedConfig.numSimulations, mergedConfig)
     );
     this.strategies.set(
       ReasoningStrategy.MCTS_002_ALT_ALPHA,
-      StrategyFactory.createStrategy(ReasoningStrategy.MCTS_002_ALT_ALPHA, this.stateManager, undefined, CONFIG.numSimulations)
+      StrategyFactory.createStrategy(ReasoningStrategy.MCTS_002_ALT_ALPHA, this.stateManager, undefined, mergedConfig.numSimulations, mergedConfig)
+    );
+    
+    this.strategies.set(
+      ReasoningStrategy.MCTS_003_ALPHA,
+      StrategyFactory.createStrategy(ReasoningStrategy.MCTS_003_ALPHA, this.stateManager, undefined, mergedConfig.numSimulations, mergedConfig)
     );
 
     // Set default strategy
-    const defaultStrategy = CONFIG.defaultStrategy as ReasoningStrategy;
+    const defaultStrategy = mergedConfig.defaultStrategy as ReasoningStrategy;
     this.currentStrategy = this.strategies.get(defaultStrategy) ||
       this.strategies.get(ReasoningStrategy.BEAM_SEARCH)!;
   }

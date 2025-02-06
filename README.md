@@ -1,12 +1,30 @@
 # MCP Reasoner
-A reasoning implementation for Claude Desktop that lets you use both Beam Search and Monte Carlo Tree Search (MCTS). tbh this started as a way to see if we could make Claude even better at complex problem-solving... turns out we definitely can.
+A reasoning implementation for Claude Desktop that lets you use both Beam Search and Monte Carlo Tree Search (MCTS). A sophisticated tool for enhancing Claude's problem-solving capabilities through structured reasoning strategies.
 
 ### Current Version:
+**v2.3.0**
+
+#### What's New:
+
+> Added R1-Sonnet Integration:
+>
+>     - New tool schema `mcp-reasoner-r1`:
+>
+>         - Integration with Groq's deepseek-r1-distill-llama-70b model
+>
+>         - Chain-of-thought reasoning with critique cycle
+>
+>         - Enhanced problem-solving through iterative refinement
+>
+>     *NOTE* Requires Groq API key for accessing the models.
+>     *NOTE* Uses both deepseek-r1-distill-llama-70b for reasoning and llama-3.3-70b-versatile for critique.
+
+#### Previous Version:
 **v2.0.0**
 
 #### What's New:
 
-> Added 2 Experimental Reasoning Algorithms:
+> Added 3 Experimental Reasoning Algorithms:
 >
 >     - `mcts-002-alpha`
 >
@@ -23,35 +41,47 @@ A reasoning implementation for Claude Desktop that lets you use both Beam Search
 >         - Also includes an early *alpha* implementation of Adaptive Exploration Simulator & Outcome Based Reasoning Simulator
 >
 >     *NOTE* the implementation of these alpha simulators is not complete and is subject to change
-
-
-What happened to `mcts-001-alpha` and `mcts-001alt-alpha`?
-> Quite simply: It was useless and near similar to the base `mcts` method. After initial testing the results yielded in basic thought processes was near similar showing that simply adding policy simulation may not have an effect.
-
-So why add Polciy Simulation Layer now?
-> Well i think its important to incorporate Policy AND Search in tandem as that is how most of the algorithms implement them.
-
-#### Previous Versions:
-**v1.1.0**
-
-> Added model control over search parameters:
 >
-> beamWidth - lets Claude adjust how many paths to track (1-10)
+>     - `mcts-003-alpha`
 >
-> numSimulations - fine-tune MCTS simulation count (1-150)
+>         - Implements GPRO (Guided Policy with Recursive Optimization)
+>
+>         - Enhanced policy network with recursive optimization for improved path selection
+>
+>         - Dynamic adaptation of exploration/exploitation balance
+>
+>     *NOTE* GPRO implementation is in alpha stage and undergoing active development
+>
+>         - Uses the Bidirectional Search Method along with an early *alpha* implementation of a Policy Simulation Layer
+>
+>         - Also includes an early *alpha* implementation of Adaptive Exploration Simulator & Outcome Based Reasoning Simulator
+>
+>     *NOTE* the implementation of these alpha simulators is not complete and is subject to change
+
 
 ## Features
-- Two search strategies that you can switch between:
-   - Beam search (good for straightforward stuff)
-   - MCTS (when stuff gets complex) with alpha variations (see above)
-- Tracks how good different reasoning paths are
-- Maps out all the different ways Claude thinks through problems
-- Analyzes how the reasoning process went
-- Follows the MCP protocol (obviously)
+- Multiple sophisticated reasoning strategies:
+   - Beam Search: Optimized for linear, sequential reasoning
+   - MCTS: Enhanced tree search for complex problem spaces
+   - Policy-Guided MCTS: Advanced policy network integration
+   - Bidirectional MCTS: Efficient path exploration
+   - GPRO MCTS: State-of-the-art policy optimization
+   - Groq Integration: External model reasoning support
+- Comprehensive reasoning analysis:
+   - Path quality evaluation
+   - Alternative path exploration
+   - Reasoning critique and refinement
+   - Detailed metrics collection
+- Advanced features:
+   - Dynamic strategy switching
+   - Adaptive exploration rates
+   - Trust region optimization
+   - Streaming response support
+- Full MCP protocol compliance
 
 ## Installation
 ```
-git clone https://github.com/frgmt0/mcp-reasoner.git 
+git clone https://github.com/frgmt0/mcp-reasoner.git
 
 OR clone the original:
 
@@ -70,6 +100,9 @@ Add to Claude Desktop config:
     "mcp-reasoner": {
       "command": "node",
       "args": ["path/to/mcp-reasoner/dist/index.js"],
+      "env": {
+        "GROQ_API_KEY": "your-groq-api-key"
+      }
     }
   }
 }
