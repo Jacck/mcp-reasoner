@@ -160,72 +160,14 @@ export class R1SonnetStrategy extends BaseStrategy {
   }
 
   public async getR1Response(prompt: string): Promise<string> {
-    if (!this.apiKey) {
-      throw new Error('OPENROUTER_API_KEY environment variable is not set');
-    }
-
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 minute timeout
-
-      console.log('Sending request to OpenRouter API...');
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${this.apiKey}`,
-          "HTTP-Referer": this.siteUrl,
-          "X-Title": this.siteName,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          "model": "deepseek/deepseek-r1",
-          "messages": [
-            {
-              "role": "user",
-              "content": prompt
-            }
-          ],
-          "stream": false,
-          "max_tokens": 4096
-        }),
-        signal: controller.signal
-      });
-
-      clearTimeout(timeoutId);
-      console.log('Received response from OpenRouter API');
-
-      const responseText = await response.text();
-      console.log('Raw response:', responseText);
-
-      if (!response.ok) {
-        try {
-          const errorData = JSON.parse(responseText);
-          throw new Error(errorData.error?.message || `API returned status ${response.status}`);
-        } catch (e) {
-          throw new Error(`API returned status ${response.status}: ${responseText}`);
-        }
-      }
-
-      let data: R1Response;
-      try {
-        data = JSON.parse(responseText) as R1Response;
-        console.log('Parsed response data:', data);
-      } catch (e) {
-        console.error('Failed to parse response JSON:', e);
-        throw new Error('Failed to parse API response as JSON');
-      }
-      
-      if (!data.choices?.[0]?.message?.content) {
-        console.error('Invalid response format:', data);
-        throw new Error('Received invalid response format from API');
-      }
-
-      const content = data.choices[0].message.content;
-      console.log('Successfully extracted content:', content);
-      return content;
+      const thought = await this.generateReasoning(prompt);
+      const critique = await this.generateCritique(thought);
+      const refinement = await this.refineReasoning(thought, critique);
+      return refinement;
     } catch (error) {
       const friendlyMessage = this.formatErrorMessage(error);
-      console.error('Error calling R1 API:', error);
+      console.error('Error in R1 reasoning cycle:', error);
       throw new Error(friendlyMessage);
     }
   }

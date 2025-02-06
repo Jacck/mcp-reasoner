@@ -10,14 +10,14 @@ A reasoning implementation for Claude Desktop that lets you use both Beam Search
 >
 >     - New tool schema `mcp-reasoner-r1`:
 >
->         - Direct integration with deepseek/deepseek-r1 model
+>         - Integration with Groq's deepseek-r1-distill-llama-70b model
 >
->         - Allows Claude to leverage R1's reasoning capabilities
+>         - Chain-of-thought reasoning with critique cycle
 >
->         - Simplified API for direct model access
+>         - Enhanced problem-solving through iterative refinement
 >
->     *NOTE* Requires OpenRouter API key for accessing the R1 model.
->     *NOTE* While OpenRouter selects deepseek/deepseek-r1 as the default model to lower costs, often Fireworks/TogetherAI is selected as the provider as fallback.
+>     *NOTE* Requires Groq API key for accessing the models.
+>     *NOTE* Uses both deepseek-r1-distill-llama-70b for reasoning and llama-3.3-70b-versatile for critique.
 
 #### Previous Version:
 **v2.0.0**
@@ -90,9 +90,7 @@ Add to Claude Desktop config:
       "command": "node",
       "args": ["path/to/mcp-reasoner/dist/index.js"],
       "env": {
-        "OPENROUTER_API_KEY": "your-openrouter-api-key"
-        "SITE_URL": "https://github.com/Jacck/mcp-reasoner.git", // you dont have to change this
-        "SITE_NAME": "mcp-reasoner" // you dont have to change this
+        "GROQ_API_KEY": "your-groq-api-key"
       }
     }
   }
