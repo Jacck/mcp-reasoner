@@ -105,4 +105,4 @@ export interface ReasoningStats extends BaseMetrics {
   strategyMetrics: Record<string, any>;
 }
 
-export * from './base-types';
+export * from './base-types.js';
