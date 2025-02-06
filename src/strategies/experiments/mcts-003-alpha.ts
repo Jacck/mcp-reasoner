@@ -73,11 +73,95 @@ export class MCTS003AlphaStrategy extends MCTS002AlphaStrategy {
   private readonly valueCoef: number = 0.5;
   private readonly maxKLDiv: number = 0.01;
   private readonly trustRegionDelta: number = 0.01;
+  protected readonly learningRate: number = 0.1;
   private gproMetrics: GPROMetrics;
 
   constructor(stateManager: any, numSimulations: number = CONFIG.numSimulations) {
     super(stateManager, numSimulations);
     this.gproMetrics = this.initializeGPROMetrics();
+  }
+
+  private async getAlternativePaths(node: GPROPolicyNode): Promise<ThoughtNode[][]> {
+    const allNodes = await this.stateManager.getAllNodes();
+    const currentPath = await this.stateManager.getPath(node.id);
+    
+    // Group nodes by depth
+    const nodesByDepth = new Map<number, ThoughtNode[]>();
+    allNodes.forEach(n => {
+      const nodes = nodesByDepth.get(n.depth) || [];
+      nodes.push(n);
+      nodesByDepth.set(n.depth, nodes);
+    });
+    
+    // Find alternative paths
+    const alternatives: ThoughtNode[][] = [];
+    for (const [depth, nodes] of nodesByDepth) {
+      if (depth <= node.depth) {
+        const altNodes = nodes.filter(n => 
+          !currentPath.some(p => p.id === n.id) &&
+          n.score > 0.5
+        );
+        if (altNodes.length > 0) {
+          alternatives.push(await Promise.all(
+            altNodes.map(n => this.stateManager.getPath(n.id))
+          ));
+        }
+      }
+    }
+    
+    return alternatives;
+  }
+
+  private async analyzeMistakes(path: ThoughtNode[]): Promise<string[]> {
+    const mistakes: string[] = [];
+    
+    for (let i = 1; i < path.length; i++) {
+      const current = path[i] as GPROPolicyNode;
+      const prev = path[i-1] as GPROPolicyNode;
+      
+      // Check for significant score drops
+      if (current.score < prev.score * 0.7) {
+        mistakes.push(`Reasoning quality dropped at step ${i}`);
+      }
+      
+      // Check for policy violations
+      if (current.trustRegionViolation) {
+        mistakes.push(`Trust region violated at step ${i}`);
+      }
+      
+      // Check for value estimate inconsistencies
+      if (Math.abs(current.valueEstimate - prev.valueEstimate) > 0.5) {
+        mistakes.push(`Inconsistent value estimates at step ${i}`);
+      }
+    }
+    
+    return mistakes;
+  }
+
+  private async getBestOutcomes(node: GPROPolicyNode): Promise<string[]> {
+    const allNodes = await this.stateManager.getAllNodes() as GPROPolicyNode[];
+    return allNodes
+      .filter(n => n.score > 0.8 && n.depth >= node.depth)
+      .map(n => n.thought)
+      .slice(0, 3);
+  }
+
+  private async suggestImprovements(node: GPROPolicyNode): Promise<string[]> {
+    const improvements: string[] = [];
+    
+    if (node.valueEstimate < 0.5) {
+      improvements.push("Consider alternative approaches with higher value estimates");
+    }
+    
+    if (node.entropyBonus < 0.1) {
+      improvements.push("Explore more diverse reasoning paths");
+    }
+    
+    if (node.trustRegionViolation) {
+      improvements.push("Stay within established reasoning bounds");
+    }
+    
+    return improvements;
   }
 
   private async generateReasoningPrompt(node: GPROPolicyNode): Promise<ReasoningPrompt> {
@@ -173,7 +257,11 @@ export class MCTS003AlphaStrategy extends MCTS002AlphaStrategy {
       proximityScore: 0,
       clipRange: this.epsilon,
       kl_div: 0,
-      importanceSamplingRatio: 1.0
+      importanceSamplingRatio: 1.0,
+      confidence: 1.0,
+      reflections: [],
+      mistakeHistory: [],
+      improvements: []
     };
 
     // Initialize GPRO components
