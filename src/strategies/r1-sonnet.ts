@@ -36,10 +36,9 @@ export class R1SonnetStrategy extends BaseStrategy {
         }
       ],
       temperature: 0.6,
-      max_completion_tokens: 1024,
-      top_p: 0.95,
-      stream: true,
-      reasoning_format: "raw"
+      maxTokens: 1024,
+      topP: 0.95,
+      stream: true
     });
 
     for await (const chunk of completion) {
@@ -65,8 +64,8 @@ export class R1SonnetStrategy extends BaseStrategy {
         }
       ],
       temperature: 0.5,
-      max_completion_tokens: 1024,
-      top_p: 1,
+      maxTokens: 1024,
+      topP: 1,
       stream: true
     });
 
@@ -93,10 +92,9 @@ export class R1SonnetStrategy extends BaseStrategy {
         }
       ],
       temperature: 0.6,
-      max_completion_tokens: 1024,
-      top_p: 0.95,
-      stream: true,
-      reasoning_format: "raw"
+      maxTokens: 1024,
+      topP: 0.95,
+      stream: true
     });
 
     for await (const chunk of completion) {
