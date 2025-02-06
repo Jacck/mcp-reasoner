@@ -58,3 +58,43 @@ export const DEFAULT_CONFIG: Config = {
   defaultStrategy: 'beam_search',
   numSimulations: 50
 };
+import { BaseNode, BaseRequest, BaseResponse, BaseMetrics } from './base-types';
+
+// Strategy-specific extensions of base types
+export interface ThoughtNode extends BaseNode {
+  visits?: number;
+  totalReward?: number;
+  untriedActions?: string[];
+  policyScore?: number;
+  valueEstimate?: number;
+  priorActionProbs?: Map<string, number>;
+  puct?: number;
+  actionHistory?: string[];
+  noveltyScore?: number;
+  confidence?: number;
+}
+
+export interface ReasoningRequest extends BaseRequest {
+  beamWidth?: number;
+  numSimulations?: number;
+  strategyType?: string;
+}
+
+export interface ReasoningResponse extends BaseResponse {
+  currentPrompt?: string;
+  reasoningContext?: {
+    instruction: string;
+    currentPath: string[];
+    alternativePaths: string[];
+    mistakes: string[];
+    improvements: string[];
+    confidence: number;
+  };
+}
+
+export interface ReasoningStats extends BaseMetrics {
+  strategyMetrics: Record<string, any>;
+}
+
+export * from './config';
+export * from './base-types';
