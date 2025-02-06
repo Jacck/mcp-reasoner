@@ -98,6 +98,7 @@ export interface ReasoningResponse extends BaseResponse {
     improvements: string[];
     confidence: number;
   };
+  strategyMetrics?: Record<string, any>;
 }
 
 export interface ReasoningStats extends BaseMetrics {

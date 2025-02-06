@@ -37,7 +37,7 @@ export class PolicyGuidedMCTS extends MonteCarloTreeSearchStrategy {
   private policyMetrics: PolicyMetrics;
   protected readonly simulationCount: number;
 
-  constructor(stateManager: any, numSimulations: number = CONFIG.numSimulations) {
+  constructor(stateManager: any, numSimulations: number = DEFAULT_CONFIG.numSimulations) {
     super(stateManager, numSimulations);
     this.temperature = 1.0;
     this.explorationRate = Math.sqrt(2);
@@ -146,7 +146,7 @@ export class PolicyGuidedMCTS extends MonteCarloTreeSearchStrategy {
   private estimateValue(node: PolicyGuidedNode): number {
     // Combine immediate score with future potential
     const immediateValue = node.score;
-    const depthPotential = 1 - (node.depth / CONFIG.maxDepth);
+    const depthPotential = 1 - (node.depth / DEFAULT_CONFIG.maxDepth);
     const noveltyValue = node.noveltyScore || 0;
     
     return (
@@ -251,7 +251,7 @@ export class PolicyGuidedMCTS extends MonteCarloTreeSearchStrategy {
     let totalReward = 0;
     let depth = 0;
     
-    while (!current.isComplete && depth < CONFIG.maxDepth) {
+    while (!current.isComplete && depth < DEFAULT_CONFIG.maxDepth) {
       const reward = current.valueEstimate;
       totalReward += reward;
       

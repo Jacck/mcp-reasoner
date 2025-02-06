@@ -6,7 +6,7 @@ export class BeamSearchStrategy extends BaseStrategy {
   private beamWidth: number;
   private beams: Map<number, ThoughtNode[]>;
 
-  constructor(stateManager: any, beamWidth: number = CONFIG.beamWidth) {
+  constructor(stateManager: any, beamWidth: number = DEFAULT_CONFIG.beamWidth) {
     super(stateManager);
     this.beamWidth = beamWidth;
     this.beams = new Map();

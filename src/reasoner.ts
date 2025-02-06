@@ -10,7 +10,7 @@ export class Reasoner {
   private strategies: Map<ReasoningStrategy, BaseStrategy>;
 
   constructor(config: Partial<Config> = {}) {
-    const mergedConfig = { ...CONFIG, ...config };
+    const mergedConfig = { ...DEFAULT_CONFIG, ...config };
     this.stateManager = new StateManager(mergedConfig.cacheSize);
     
     // Initialize available strategies

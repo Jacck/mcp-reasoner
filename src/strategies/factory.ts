@@ -35,7 +35,7 @@ export class StrategyFactory {
       case ReasoningStrategy.MCTS_002_ALT_ALPHA:
         return new BidirectionalMCTS(stateManager, numSimulations);
       case ReasoningStrategy.R1_SONNET:
-        return new R1SonnetStrategy(stateManager);
+        return new GroqStrategy(stateManager);
       case ReasoningStrategy.MCTS_003_ALPHA:
         return new GPROMCTS(stateManager, numSimulations);
       default:
