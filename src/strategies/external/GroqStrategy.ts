@@ -1,5 +1,5 @@
-import { BaseStrategy } from "./base.js";
-import { ReasoningRequest, ReasoningResponse } from "../types.js";
+import { BaseStrategy } from "../base/BaseStrategy.js";
+import { ReasoningRequest, ReasoningResponse } from "../../core/types.js";
 import Groq from "groq-sdk";
 
 export class R1SonnetStrategy extends BaseStrategy {
