@@ -1,20 +1,20 @@
-import { StateManager } from '../state.js';
-import { Config } from '../core/types.js';
-import { BaseStrategy } from './base/BaseStrategy.js';
-import { BeamSearchStrategy } from './search/beam/BeamStrategy.js';
-import { MonteCarloTreeSearchStrategy } from './search/mcts/MCTSStrategy.js';
-import { PolicyGuidedMCTS } from './search/mcts/variants/PolicyGuidedMCTS.js';
-import { BidirectionalMCTS } from './search/mcts/variants/BidirectionalMCTS.js';
-import { GPROMCTS } from './search/mcts/variants/GPROMCTS.js';
-import { GroqStrategy } from './external/GroqStrategy.js';
+import { StateManager } from "../state.js";
+import { Config } from "../core/types.js";
+import { BaseStrategy } from "./base/BaseStrategy.js";
+import { BeamSearchStrategy } from "./search/beam/BeamStrategy.js";
+import { MonteCarloTreeSearchStrategy } from "./search/mcts/MCTSStrategy.js";
+import { PolicyGuidedMCTS } from "./search/mcts/variants/PolicyGuidedMCTS.js";
+import { BidirectionalMCTS } from "./search/mcts/variants/BidirectionalMCTS.js";
+import { GPROMCTS } from "./search/mcts/variants/GPROMCTS.js";
+import { R1SonnetStrategy } from "./external/GroqStrategy.js";
 
 export enum ReasoningStrategy {
-  BEAM_SEARCH = 'beam_search',
-  MCTS = 'mcts',
-  MCTS_002_ALPHA = 'mcts_002_alpha',
-  MCTS_002_ALT_ALPHA = 'mcts_002_alt_alpha',
-  MCTS_003_ALPHA = 'mcts_003_alpha',
-  R1_SONNET = 'r1_sonnet'
+  BEAM_SEARCH = "beam_search",
+  MCTS = "mcts",
+  MCTS_002_ALPHA = "mcts_002_alpha",
+  MCTS_002_ALT_ALPHA = "mcts_002_alt_alpha",
+  MCTS_003_ALPHA = "mcts_003_alpha",
+  R1_SONNET = "r1_sonnet",
 }
 
 export class StrategyFactory {
@@ -23,7 +23,7 @@ export class StrategyFactory {
     stateManager: StateManager,
     beamWidth?: number,
     numSimulations?: number,
-    config?: Partial<Config>
+    config?: Partial<Config>,
   ): BaseStrategy {
     switch (type) {
       case ReasoningStrategy.BEAM_SEARCH:
@@ -35,7 +35,7 @@ export class StrategyFactory {
       case ReasoningStrategy.MCTS_002_ALT_ALPHA:
         return new BidirectionalMCTS(stateManager, numSimulations);
       case ReasoningStrategy.R1_SONNET:
-        return new GroqStrategy(stateManager);
+        return new R1SonnetStrategy(stateManager);
       case ReasoningStrategy.MCTS_003_ALPHA:
         return new GPROMCTS(stateManager, numSimulations);
       default:
