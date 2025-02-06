@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { Reasoner } from './reasoner.js';
-import { ReasoningStrategy } from './strategies/factory.js';
-import { R1SonnetStrategy } from './strategies/r1-sonnet.js';
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
+import { Reasoner } from "./reasoner.js";
+import { ReasoningStrategy } from "./strategies/factory.js";
+import { R1SonnetStrategy } from "./strategies/r1-sonnet.js";
 
 // Initialize server
 const server = new Server(
@@ -16,7 +19,7 @@ const server = new Server(
     capabilities: {
       tools: {},
     },
-  }
+  },
 );
 
 // Initialize reasoner
@@ -31,7 +34,7 @@ function processInput(input: any) {
     nextThoughtNeeded: Boolean(input.nextThoughtNeeded),
     strategyType: input.strategyType as ReasoningStrategy | undefined,
     beamWidth: Number(input.beamWidth || 3),
-    numSimulations: Number(input.numSimulations || 50)
+    numSimulations: Number(input.numSimulations || 50),
   };
 
   // Validate
@@ -56,65 +59,75 @@ function processInput(input: any) {
 
 // Register the tool
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [{
-    name: "mcp-reasoner",
-    description: "Advanced reasoning tool with multiple strategies including Beam Search and Monte Carlo Tree Search",
-    inputSchema: {
-      type: "object",
-      properties: {
-        thought: {
-          type: "string",
-          description: "Current reasoning step"
+  tools: [
+    {
+      name: "mcp-reasoner",
+      description:
+        "Advanced reasoning tool with multiple strategies including Beam Search and Monte Carlo Tree Search",
+      inputSchema: {
+        type: "object",
+        properties: {
+          thought: {
+            type: "string",
+            description: "Current reasoning step",
+          },
+          thoughtNumber: {
+            type: "integer",
+            description: "Current step number",
+            minimum: 1,
+          },
+          totalThoughts: {
+            type: "integer",
+            description: "Total expected steps",
+            minimum: 1,
+          },
+          nextThoughtNeeded: {
+            type: "boolean",
+            description: "Whether another step is needed",
+          },
+          strategyType: {
+            type: "string",
+            enum: Object.values(ReasoningStrategy),
+            description: "Reasoning strategy to use (beam_search or mcts)",
+          },
+          beamWidth: {
+            type: "integer",
+            description:
+              "Number of top paths to maintain (n-sampling). Defaults to 3 if not specified",
+            minimum: 1,
+            maximum: 10,
+          },
+          numSimulations: {
+            type: "integer",
+            description:
+              "Number of MCTS simulations to run. Defaults to 50 if not specified",
+            minimum: 1,
+            maximum: 150,
+          },
         },
-        thoughtNumber: {
-          type: "integer",
-          description: "Current step number",
-          minimum: 1
-        },
-        totalThoughts: {
-          type: "integer",
-          description: "Total expected steps",
-          minimum: 1
-        },
-        nextThoughtNeeded: {
-          type: "boolean",
-          description: "Whether another step is needed"
-        },
-        strategyType: {
-          type: "string",
-          enum: Object.values(ReasoningStrategy),
-          description: "Reasoning strategy to use (beam_search or mcts)"
-        },
-        beamWidth: {
-          type: "integer",
-          description: "Number of top paths to maintain (n-sampling). Defaults to 3 if not specified",
-          minimum: 1,
-          maximum: 10
-        },
-        numSimulations: {
-          type: "integer",
-          description: "Number of MCTS simulations to run. Defaults to 50 if not specified",
-          minimum: 1,
-          maximum: 150
-        }
+        required: [
+          "thought",
+          "thoughtNumber",
+          "totalThoughts",
+          "nextThoughtNeeded",
+        ],
       },
-      required: ["thought", "thoughtNumber", "totalThoughts", "nextThoughtNeeded"]
-    }
-  },
-  {
-    name: "mcp-reasoner-r1",
-    description: "Use deepseek/deepseek-r1 to think about the given topic.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        prompt: {
-          type: "string",
-          description: "what the user's prompt was/is"
-        }
+    },
+    {
+      name: "mcp-reasoner-r1",
+      description: "Use deepseek/deepseek-r1 to think about the given topic.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          prompt: {
+            type: "string",
+            description: "what the user's prompt was/is",
+          },
+        },
+        required: ["prompt"],
       },
-      required: ["prompt"]
-    }
-  }]
+    },
+  ],
 }));
 
 // Handle requests
@@ -132,7 +145,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         nextThoughtNeeded: step.nextThoughtNeeded,
         strategyType: step.strategyType,
         beamWidth: step.beamWidth,
-        numSimulations: step.numSimulations
+        numSimulations: step.numSimulations,
       });
 
       // Get reasoning stats
@@ -140,20 +153,21 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       // Return enhanced response
       // Format the reasoning context as a prefill for Claude
-      const reasoningPrefill = response.reasoningContext ? 
-        `${response.currentPrompt}\n\n` +
-        `Previous reasoning steps:\n${response.reasoningContext.currentPath.join('\n')}\n\n` +
-        `Alternative approaches considered:\n${response.reasoningContext.alternativePaths.join('\n')}\n\n` +
-        `Mistakes to avoid:\n${response.reasoningContext.mistakes.join('\n')}\n\n` +
-        `Suggested improvements:\n${response.reasoningContext.improvements.join('\n')}\n\n` +
-        `Confidence: ${response.reasoningContext.confidence}\n\n` +
-        `Based on this context, please continue with the next reasoning step.` : '';
+      const reasoningPrefill = response.reasoningContext
+        ? `${response.currentPrompt}\n\n` +
+          `Previous reasoning steps:\n${response.reasoningContext.currentPath.join("\n")}\n\n` +
+          `Alternative approaches considered:\n${response.reasoningContext.alternativePaths.join("\n")}\n\n` +
+          `Mistakes to avoid:\n${response.reasoningContext.mistakes.join("\n")}\n\n` +
+          `Suggested improvements:\n${response.reasoningContext.improvements.join("\n")}\n\n` +
+          `Confidence: ${response.reasoningContext.confidence}\n\n` +
+          `Based on this context, please continue with the next reasoning step.`
+        : "";
 
       const result = {
         thoughtNumber: step.thoughtNumber,
         totalThoughts: step.totalThoughts,
         nextThoughtNeeded: step.nextThoughtNeeded,
-        thought: reasoningPrefill + '\n\n' + step.thought,
+        thought: reasoningPrefill + "\n\n" + step.thought,
         nodeId: response.nodeId,
         score: response.score,
         strategyUsed: response.strategyUsed,
@@ -162,83 +176,93 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           averageScore: stats.averageScore,
           maxDepth: stats.maxDepth,
           branchingFactor: stats.branchingFactor,
-          strategyMetrics: stats.strategyMetrics
-        }
+          strategyMetrics: stats.strategyMetrics,
+        },
       };
 
       return {
-        content: [{
-          type: "text",
-          text: JSON.stringify(result)
-        }]
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(result),
+          },
+        ],
       };
-    }
-    else if (request.params.name === "mcp-reasoner-r1") {
+    } else if (request.params.name === "mcp-reasoner-r1") {
       try {
-        console.log('R1 request received:', request.params.arguments);
+        console.log("R1 request received:", request.params.arguments);
         const r1Strategy = new R1SonnetStrategy(null);
-        const response = await r1Strategy.getR1Response(request.params.arguments.prompt);
-        console.log('R1 response received:', response);
+        const response = await r1Strategy.getR1Response(
+          request.params.arguments.prompt,
+        );
+        console.log("R1 response received:", response);
 
         const result = {
           success: true,
           response,
           metadata: {
-            model: "deepseek/deepseek-r1",
-            timestamp: new Date().toISOString()
-          }
+            model: "deepseek-r1-distill-llama-70b",
+            timestamp: new Date().toISOString(),
+          },
         };
-        console.log('Sending result:', result);
+        console.log("Sending result:", result);
 
         return {
-          content: [{
-            type: "text",
-            text: JSON.stringify(result)
-          }]
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result),
+            },
+          ],
         };
       } catch (error) {
         return {
-          content: [{
-            type: "text",
-            text: JSON.stringify({
-              success: false,
-              error: error instanceof Error ? error.message : String(error),
-              metadata: {
-                model: "deepseek/deepseek-r1",
-                timestamp: new Date().toISOString()
-              }
-            })
-          }],
-          isError: true
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                success: false,
+                error: error instanceof Error ? error.message : String(error),
+                metadata: {
+                  model: "deepseek-r1-distill-llama-70b",
+                  timestamp: new Date().toISOString(),
+                },
+              }),
+            },
+          ],
+          isError: true,
         };
       }
-    }
-    else {
+    } else {
       return {
-        content: [{
-          type: "text",
-          text: JSON.stringify({ error: "Unknown tool", success: false })
-        }],
-        isError: true
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({ error: "Unknown tool", success: false }),
+          },
+        ],
+        isError: true,
       };
     }
   } catch (error) {
     return {
-      content: [{
-        type: "text",
-        text: JSON.stringify({
-          error: error instanceof Error ? error.message : String(error),
-          success: false
-        })
-      }],
-      isError: true
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify({
+            error: error instanceof Error ? error.message : String(error),
+            success: false,
+          }),
+        },
+      ],
+      isError: true,
     };
   }
 });
 
 // Start server
 const transport = new StdioServerTransport();
-server.connect(transport).catch(error => {
+server.connect(transport).catch((error) => {
   process.stderr.write(`Error starting server: ${error}\n`);
   process.exit(1);
 });
