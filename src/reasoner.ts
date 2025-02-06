@@ -1,4 +1,4 @@
-import { ThoughtNode, ReasoningRequest, ReasoningResponse, ReasoningStats, CONFIG, Config } from './core/types.js';
+import { ThoughtNode, ReasoningRequest, ReasoningResponse, ReasoningStats, Config, DEFAULT_CONFIG } from './core/types.js';
 import { StateManager } from './state.js';
 import { StrategyFactory, ReasoningStrategy } from './strategies/factory.js';
 import { BaseStrategy } from './strategies/base/BaseStrategy.js';

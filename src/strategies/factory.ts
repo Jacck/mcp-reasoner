@@ -6,7 +6,7 @@ import { MonteCarloTreeSearchStrategy } from "./search/mcts/MCTSStrategy.js";
 import { PolicyGuidedMCTS } from "./search/mcts/variants/PolicyGuidedMCTS.js";
 import { BidirectionalMCTS } from "./search/mcts/variants/BidirectionalMCTS.js";
 import { GPROMCTS } from "./search/mcts/variants/GPROMCTS.js";
-import { R1SonnetStrategy } from "./external/GroqStrategy.js";
+import { GroqStrategy } from "./external/GroqStrategy.js";
 
 export enum ReasoningStrategy {
   BEAM_SEARCH = "beam_search",

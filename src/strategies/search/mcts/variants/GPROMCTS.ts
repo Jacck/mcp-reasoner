@@ -311,7 +311,7 @@ export class GPROMCTS extends PolicyGuidedMCTS {
         improvements: reasoningPrompt.reflection.improvements,
         confidence: reasoningPrompt.reflection.confidence,
       },
-      metrics: {
+      strategyMetrics: {
         ...this.gproMetrics,
         nodeStats: {
           advantageEstimate: node.advantageEstimate,
@@ -456,7 +456,7 @@ export class GPROMCTS extends PolicyGuidedMCTS {
     const trajectory: GPROPolicyNode[] = [startNode];
     let current = startNode;
 
-    while (!current.isComplete && trajectory.length < CONFIG.maxDepth) {
+    while (!current.isComplete && trajectory.length < DEFAULT_CONFIG.maxDepth) {
       const nextNode = await this.selectNextNode(current);
       if (!nextNode) break;
 

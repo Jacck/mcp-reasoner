@@ -130,7 +130,7 @@ export class GroqStrategy extends BaseStrategy {
     return "An unexpected error occurred while calling the Groq API.";
   }
 
-  private async executeReasoningCycle(initialPrompt: string): Promise<
+  public async executeReasoningCycle(initialPrompt: string): Promise<
     Array<{
       thought: string;
       critique: string;

@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { ThoughtNode, ReasoningRequest, ReasoningResponse, CONFIG } from '../../../types.js';
+import { ThoughtNode, ReasoningRequest, ReasoningResponse, DEFAULT_CONFIG } from '../../../core/types.js';
 import { BaseStrategy } from '../../base/BaseStrategy.js';
 
 interface MCTSNode extends ThoughtNode {
