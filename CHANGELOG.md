@@ -7,6 +7,17 @@ Note: Changelog is not complete and may be updated at any time for any reason. R
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2025-02-10
+
+### Added
+- MCTS-003-Alpha strategy with GPRO implementation
+  - Guided Policy with Recursive Optimization
+  - Enhanced policy network architecture
+  - Dynamic exploration/exploitation balancing
+  - Improved path selection through recursive optimization
+- Extended documentation for GPRO technical details
+- New benchmarking metrics for policy evaluation
+
 ## [2.1.0] - 2025-01-27
 
 ### Added

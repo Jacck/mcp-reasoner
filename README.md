@@ -24,7 +24,7 @@ A reasoning implementation for Claude Desktop that lets you use both Beam Search
 
 #### What's New:
 
-> Added 2 Experimental Reasoning Algorithms:
+> Added 3 Experimental Reasoning Algorithms:
 >
 >     - `mcts-002-alpha`
 >
@@ -35,6 +35,22 @@ A reasoning implementation for Claude Desktop that lets you use both Beam Search
 >     *NOTE* the implementation of these alpha simulators is not complete and is subject to change
 >
 >     - `mcts-002alt-alpha`
+>
+>         - Uses the Bidirectional Search Method along with an early *alpha* implementation of a Policy Simulation Layer
+>
+>         - Also includes an early *alpha* implementation of Adaptive Exploration Simulator & Outcome Based Reasoning Simulator
+>
+>     *NOTE* the implementation of these alpha simulators is not complete and is subject to change
+>
+>     - `mcts-003-alpha`
+>
+>         - Implements GPRO (Guided Policy with Recursive Optimization)
+>
+>         - Enhanced policy network with recursive optimization for improved path selection
+>
+>         - Dynamic adaptation of exploration/exploitation balance
+>
+>     *NOTE* GPRO implementation is in alpha stage and undergoing active development
 >
 >         - Uses the Bidirectional Search Method along with an early *alpha* implementation of a Policy Simulation Layer
 >

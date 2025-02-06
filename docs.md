@@ -53,16 +53,30 @@ The MCP Reasoner is a sophisticated reasoning engine that implements multiple st
   - Configurable simulation count (1-150)
   - Default: 50 simulations
 
-### 3. MCTS Alpha (Experimental)
-- **Description**: Enhanced MCTS with A* implementation
-- **Features**:
-  - Outcome-based Reward Method (ORM)
-  - Adaptive exploration rate
-  - Policy-guided search
+### 3. MCTS Alpha Series (Experimental)
+- **Description**: Enhanced MCTS implementations with advanced features
+- **Variants**:
+  a. MCTS-002-Alpha
+    - A* implementation with Policy Simulation
+    - Outcome-based Reward Method (ORM)
+    - Adaptive exploration rate
+  
+  b. MCTS-002Alt-Alpha
+    - Bidirectional search implementation
+    - Policy-guided exploration
+    - Adaptive path optimization
+  
+  c. MCTS-003-Alpha with GPRO
+    - Guided Policy with Recursive Optimization
+    - Enhanced policy network architecture
+    - Dynamic exploration/exploitation balance
+    - Recursive path optimization
+    
 - **Best For**:
   - Advanced technical analysis
   - Long-term consequence evaluation
   - Strategic decision-making
+  - Complex multi-path optimization
 
 ## Evaluation Metrics
 
